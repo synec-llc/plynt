@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@color/plynt_blue"
+    tools:context=".aSplash2Activity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+        <!-- GUIDELINES -->
+        <!-- Top guideline 15% -->
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guidelineTop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintGuide_percent="0.20"
+            android:orientation="horizontal" />
+
+        <!-- Bottom guideline @ 10% -->
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guidelineBottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintGuide_percent="0.97"
+            android:orientation="horizontal" />
+
+        <!-- Left Guideline for 10% left margin -->
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guidelineLeft"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintGuide_percent="0.05"
+            android:orientation="vertical" />
+
+        <!-- Right Guideline for 10% right margin -->
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guidelineRight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintGuide_percent="0.95"
+            android:orientation="vertical" />
+
+        <!-- Title Text -->
+        <TextView
+            android:id="@+id/titleSplashPlyntIntroduction"
+            style="@style/SplashTextTitleStyle"
+            android:text="@string/introducing_plynt"
+            android:layout_marginTop="@dimen/dimension_0_dp"
+            app:layout_constraintEnd_toEndOf="@id/guidelineRight"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@id/guidelineLeft"
+            app:layout_constraintTop_toTopOf="@+id/guidelineTop" />
+
+        <!-- VideoView -->
+        <VideoView
+            android:id="@+id/videoViewSplash"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/margin_medium"
+            app:layout_constraintEnd_toStartOf="@+id/guidelineRight"
+            app:layout_constraintStart_toStartOf="@+id/guidelineLeft"
+            app:layout_constraintTop_toBottomOf="@+id/titleSplashPlyntIntroduction" />
+
+        <!-- Introduction Message Text -->
+        <TextView
+            android:id="@+id/textSplashPlyntIntroductionMessage"
+            style="@style/SplashTextMessageStyle"
+            android:layout_width="371dp"
+            android:layout_height="530dp"
+            android:layout_marginTop="@dimen/margin_small"
+            android:text="@string/splash_message_plynt_introduction"
+            android:textAlignment="textStart"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@id/guidelineRight"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@id/guidelineLeft"
+            app:layout_constraintTop_toBottomOf="@+id/videoViewSplash" />
+
+<!--        skip text-->
+        <TextView
+            android:id="@+id/skipTextView"
+            style="@style/SkipTextStyle"
+            android:text="@string/skip_text"
+            app:layout_constraintBottom_toBottomOf="@+id/textSplashPlyntIntroductionMessage"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:ignore="HardcodedText" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

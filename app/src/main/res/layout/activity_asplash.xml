@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/plynt_blue"
+    tools:context=".aSplashActivity">
+
+<!--    GUIDELINES-->
+<!--    Top guideline 15%-->
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineTop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintGuide_percent="0.15"
+        android:orientation="horizontal" />
+
+<!--    Bottom guideline @ 10%-->
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineBottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintGuide_percent="0.9"
+        android:orientation="horizontal" />
+
+    <!-- Left Guideline for 10% left margin -->
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        app:layout_constraintGuide_percent="0.10"
+        android:orientation="vertical" />
+
+    <!-- Right Guideline for 10% right margin -->
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineRight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintGuide_percent="0.90"
+        android:orientation="vertical" />
+
+
+    <ImageView
+        android:id="@+id/imageSplash"
+        android:layout_width="@dimen/dimension_0_dp"
+        android:layout_height="@dimen/dimension_0_dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/guidelineTop"
+        app:layout_constraintWidth_percent="0.75"
+        app:srcCompat="@drawable/image_splash_1" />
+
+
+
+
+    <TextView
+        android:id="@+id/titleSplash"
+        style="@style/SplashTextTitleStyle"
+        android:text="@string/splash_title_1"
+        app:layout_constraintStart_toStartOf="@id/guidelineLeft"
+        app:layout_constraintEnd_toEndOf="@id/guidelineRight"
+        app:layout_constraintTop_toBottomOf="@+id/imageSplash" />
+
+
+
+    <TextView
+        android:id="@+id/textSplash"
+        style="@style/SplashTextMessageStyle"
+        android:text="@string/splash_message_1"
+        app:layout_constraintEnd_toEndOf="@id/guidelineRight"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@id/guidelineLeft"
+        app:layout_constraintTop_toBottomOf="@+id/titleSplash" />
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_medium"
+        app:layout_constraintBottom_toTopOf="@+id/nextButtonSplash"
+        tools:layout_editor_absoluteX="0dp">
+
+        <!-- First ImageView -->
+        <ImageView
+            android:id="@+id/image1"
+            android:layout_width="@dimen/margin_extra_small"
+            android:layout_height="@dimen/margin_medium"
+            android:layout_marginRight="@dimen/margin_small"
+            android:src="@drawable/icon_circle_turquoise"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/image2"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Second ImageView -->
+        <ImageView
+            android:id="@+id/image2"
+            android:layout_width="@dimen/margin_extra_small"
+            android:layout_height="17dp"
+            android:src="@drawable/icon_circle_white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Third ImageView -->
+        <ImageView
+            android:id="@+id/image3"
+            android:layout_width="@dimen/margin_extra_small"
+            android:layout_height="@dimen/margin_medium"
+            android:layout_marginLeft="@dimen/margin_small"
+            android:src="@drawable/icon_circle_white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/image2"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ImageView
+        android:id="@+id/nextButtonSplash"
+        android:layout_width="@dimen/dimension_70_dp"
+        android:layout_height="@dimen/dimension_70_dp"
+        android:src="@drawable/icon_next_with_white_circle_bg"
+        app:layout_constraintBottom_toTopOf="@+id/guidelineBottom"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

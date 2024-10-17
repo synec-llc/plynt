@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/margin_small"
+    android:background="@android:color/white">
+
+    <!-- Left guideline for 5% left margin -->
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/leftGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.11" />
+
+    <!-- Source of the News -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintNewsPostContentLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/leftGuideline"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/newsSource2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ABS-CBN News"
+            android:textColor="@color/black"
+            android:textSize="@dimen/body_text"
+            android:textFontWeight="900"
+            android:fontFamily="@font/nrt_bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/newsDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_smallest"
+            android:fontFamily="@font/nrt_regular"
+            android:text="Today"
+            android:layout_marginBottom="@dimen/icon_to_text_space"
+            android:textColor="@color/gray"
+            android:textSize="13sp"
+            android:textStyle="italic"
+            app:layout_constraintBottom_toBottomOf="@+id/newsSource2"
+            app:layout_constraintStart_toEndOf="@+id/newsSource2" />
+
+        <ImageView
+            android:id="@+id/icon_link"
+            android:layout_width="@dimen/small_heading"
+            android:layout_height="@dimen/small_heading"
+            android:src="@drawable/icon_link"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/newsHeadline"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/icon_to_text_space"
+            android:fontFamily="@font/nrt_regular"
+            android:text="Government to Roll Out New Digital Infrastructure Initiative"
+            android:textColor="@color/black"
+            android:textFontWeight="600"
+            android:textSize="@dimen/body_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/newsSource2" />
+
+        <TextView
+            android:id="@+id/newsBody"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/nrt_regular"
+            android:text="Manila, Philippines – The Philippine government has announced a major digital infrastructure initiative aimed at improving internet access lorem ipsum ..."
+            android:textColor="@color/dark_grey"
+            android:textSize="@dimen/body_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/newsHeadline" />
+
+        <ImageView
+            android:id="@+id/newsImage"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            android:layout_marginTop="@dimen/margin_small"
+            android:scaleType="centerCrop"
+            android:src="@drawable/profile_silhoutte"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/newsBody" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <ImageView
+        android:id="@+id/icon_search"
+        style="@style/news_post_publisher_image_style"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginRight="@dimen/icon_to_text_space"
+        android:background="@drawable/circular_image"
+        android:clipToOutline="true"
+        android:src="@drawable/profile_silhoutte"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toStartOf="@+id/leftGuideline"
+        app:layout_constraintTop_toTopOf="@+id/constraintNewsPostContentLayout"
+        app:layout_constraintWidth_percent="0.1" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintNewsReactionsLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_small"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/leftGuideline"
+        app:layout_constraintTop_toBottomOf="@+id/constraintNewsPostContentLayout">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <!-- Upvote Icon -->
+            <ImageView
+                android:id="@+id/icon_upvote"
+                android:layout_width="@dimen/medium_heading"
+                android:layout_height="@dimen/medium_heading"
+                android:src="@drawable/icon_upvote"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- Upvote Count -->
+            <TextView
+                android:id="@+id/upvoteCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="16dp"
+                android:fontFamily="@font/nrt_regular"
+                android:text="12"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/body_text"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/icon_downvote"
+                app:layout_constraintStart_toEndOf="@+id/icon_upvote"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- Downvote Icon -->
+            <ImageView
+                android:id="@+id/icon_downvote"
+                android:layout_width="@dimen/medium_heading"
+                android:layout_height="@dimen/medium_heading"
+                android:layout_marginStart="@dimen/margin_small"
+                android:src="@drawable/icon_downvote"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/upvoteCount"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- Downvote Count -->
+            <TextView
+                android:id="@+id/downvoteCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text="5"
+                android:fontFamily="@font/nrt_regular"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/body_text"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/icon_downvote"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/margin_medium"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/constraintLayout5"
+            app:layout_constraintTop_toTopOf="parent">
+
+
+            <TextView
+                android:id="@+id/commentsLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/nrt_regular"
+                android:text="Comments"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/body_text"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/commentsCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/icon_to_text_space"
+                android:fontFamily="@font/nrt_regular"
+                android:text="5"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/body_text"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/commentsLabel"
+                app:layout_constraintTop_toTopOf="@+id/commentsLabel" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <ImageView
+            android:id="@+id/icon_bookmark"
+            android:layout_width="@dimen/medium_heading"
+            android:layout_height="@dimen/medium_heading"
+            android:src="@drawable/icon_bookmark_unmarked"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@color/light_grey"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="@dimen/medium_heading"
+        android:layout_marginBottom="@dimen/medium_heading"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraintNewsReactionsLayout" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

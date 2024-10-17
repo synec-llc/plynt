@@ -1,0 +1,43 @@
+<resources>
+    <string name="app_name">Plynt</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="splash_message_1">Never miss out on important stories. Stay updated on global and local news, all in one place.</string>
+    <string name="splash_title_1">Keep in Touch with the World</string>
+    <string name="splash_title_2">Let AI Keep You Informed</string>
+    <string name="splash_message_2">Your personal news assistant. Get summarized, timely, and relevant news delivered to you, tailored just for you.</string>
+    <string name="splash_title_3">Free, Fast, and Yours Forever</string>
+    <string name="splash_message_3">Enjoy seamless, personalized news updates. No fees, no delays, and it’s yours for life.</string>
+    <string name="splash_message_plynt_introduction">
+        "Introducing Plynt – Plynt is a versatile widget designed to enhance the user experience in mobile applications.\n
+        It’s an interactive and visually appealing tool that combines sleek design with smooth animations, making it ideal for dynamic apps that require intuitive navigation and real-time updates.\n
+        Plynt offers a wide range of customizable features that developers can easily integrate into their projects, adapting it to suit both simple and complex interfaces.\n
+        From improving app usability to providing seamless transitions between app sections, Plynt helps make user interactions more fluid and enjoyable.\n
+        Whether you're building a productivity app, a creative platform, or a social network, Plynt adds a touch of modernity and elegance, bringing users a more engaging and efficient mobile experience.\n
+        Compatible with both Android and iOS, Plynt ensures that developers can maintain a consistent, professional look across platforms, while delivering performance that users will love."
+    </string>
+    <string name="skip_text"><u>Skip</u>></string>
+    <string name="introducing_plynt">Introducing Plynt!</string>
+    <string name="continue_with_google">Continue with Google</string>
+    <string name="register">Register</string>
+    <string name="password">Password</string>
+    <string name="welcome_to_plynt">Welcome to Plynt</string>
+    <string name="already_have_account_login"><u><i>Already have an account? Click here to log in</i></u></string>
+    <string name="log_in">Log In</string>
+    <string name="sign_up">Sign up</string>
+    <string name="don_t_have_an_account_yet_register_here"><u><i>Don\'t have an account yet? Register here</i></u></string>
+    <string name="privacy_policy_"> Hello there </string>
+    <string name="confirm">Confirm</string>
+    <string name="i_have_read_and_understand_the_privacy_policy_of_plynt">I have read and understand the Privacy Policy of Plynt</string>
+    <string name="title_feed">Feed</string>
+    <string name="title_plyntify">Plyntify</string>
+    <string name="title_search">Search</string>
+    <string name="title_account">Account</string>
+    <string name="search_for_topics_to_add">Search for topics to add</string>
+    <string name="user_image">User image</string>
+    <string name="settings">Settings</string>
+    <string name="send_feedback">Send Feedback</string>
+
+
+</resources>

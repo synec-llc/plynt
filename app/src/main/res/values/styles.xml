@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+        <style name="SplashTextTitleStyle">
+            <item name="android:layout_width">@dimen/dimension_0_dp</item>
+            <item name="android:layout_height">wrap_content</item>
+            <item name="android:fontFamily">@font/raleway_bold</item>
+            <item name="android:textSize">@dimen/large_heading</item>
+            <item name="android:textColor">@color/plynt_yellow</item>
+            <item name="android:textAlignment">center</item>
+            <item name="android:layout_marginTop">24dp</item>
+        </style>
+
+    <style name="SplashTextMessageStyle">
+        <item name="android:layout_width">@dimen/dimension_0_dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:fontFamily">@font/lato_regular</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">@dimen/body_text</item>
+    </style>
+
+    <!-- Define the Skip Text style -->
+    <style name="SkipTextStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginRight">@dimen/margin_small</item>
+        <item name="android:clickable">true</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:textColor">@color/light_grey</item>
+        <item name="android:textStyle">italic</item>
+        <item name="android:visibility">invisible</item>
+    </style>
+
+    <!-- Custom style for TextInputLayout named UserCredentialInputField -->
+    <style name="UserCredentialInputField">
+        <item name="boxBackgroundMode">outline</item>
+        <item name="boxCornerRadiusBottomEnd">7dp</item>
+        <item name="boxCornerRadiusBottomStart">7dp</item>
+        <item name="boxCornerRadiusTopEnd">7dp</item>
+        <item name="boxCornerRadiusTopStart">7dp</item>
+        <item name="boxStrokeColor">@color/gray</item>
+        <item name="backgroundTint">@color/white</item>
+        <item name="boxStrokeWidth">1dp</item>
+        <item name="boxBackgroundColor">@color/white</item>
+    </style>
+
+    <!-- Custom style for TextInputEditText named UserCredentialInputText -->
+    <style name="UserCredentialInputText">
+        <item name="android:fontFamily">@font/nrt_regular</item>
+        <item name="android:padding">@dimen/body_text</item>
+    </style>
+
+    <!-- Define the style for regular body text -->
+    <style name="BodyText">
+        <item name="android:fontFamily">@font/nrt_regular</item>
+        <item name="android:gravity">start</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">@dimen/body_text</item>
+    </style>
+
+        <!-- Define the Plynt Blue Heading style -->
+        <style name="PlyntBlueHeading">
+            <item name="android:fontFamily">@font/raleway_bold</item>
+            <item name="android:textColor">@color/plynt_blue</item>
+            <item name="android:textSize">@dimen/large_heading</item>
+            <item name="android:textStyle">bold</item>
+        </style>
+
+    <!-- Define the container style -->
+    <style name="SignUpContainerStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/margin_extra_small</item>
+    </style>
+
+    <style name="PlyntButtonStyle" parent="Widget.AppCompat.Button">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/margin_large</item>
+        <item name="android:background">@drawable/button_background_default</item>
+        <item name="android:fontFamily">@font/raleway_regular</item>
+        <item name="android:padding">@dimen/margin_extra_small</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@color/plynt_yellow</item>
+        <item name="android:textSize">@dimen/body_text</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="PlyntYellowButtonStyle" parent="Widget.AppCompat.Button">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/margin_large</item>
+        <item name="android:background">@drawable/button_background_default2</item>
+<!--        <item name="android:background">@drawable/</item>-->
+        <item name="android:fontFamily">@font/raleway_regular</item>
+        <item name="android:padding">@dimen/margin_extra_small</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@color/plynt_blue</item>
+        <item name="android:textSize">@dimen/body_text</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Plynt Fragment blue Heading style -->
+    <style name="PlyntFragmentBlueHeading">
+        <item name="android:fontFamily">@font/raleway_bold</item>
+        <item name="android:textColor">@color/plynt_blue</item>
+        <item name="android:textSize">@dimen/large_heading</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="PlyntFragmentBlackHeading">
+        <item name="android:fontFamily">@font/raleway_bold</item>
+        <item name="android:textColor">@color/dark_grey</item>
+        <item name="android:textSize">@dimen/large_heading</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+
+    <!-- Define the icon style for ImageView -->
+    <style name="icon_style">
+        <item name="android:layout_width">@dimen/medium_heading</item>
+        <item name="android:layout_height">@dimen/medium_heading</item>
+        <item name="android:layout_marginRight">@dimen/margin_small</item>
+        <item name="android:scaleType">centerCrop</item>
+    </style>
+
+    <style name="news_post_publisher_image_style">
+        <item name="android:layout_width">20dp</item>
+        <item name="android:layout_height">20dp</item>
+        <item name="android:scaleType">centerCrop</item>
+    </style>
+
+    <!-- Define labelTextStyle -->
+    <style name="labelTextStyle">
+        <item name="android:fontFamily">@font/nrt_regular</item>
+        <item name="android:textSize">@dimen/body_text</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+<!--    Title Label Style-->
+    <style name="profileLabelTextStyle">
+        <item name="android:fontFamily">@font/nrt_bold</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">@dimen/body_text</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Define iconLabelText style -->
+    <style name="iconLabelText">
+        <item name="android:fontFamily">@font/nrt_regular</item>
+        <item name="android:textColor">#666769</item>
+        <item name="android:textSize">@dimen/smallest_text</item>
+    </style>
+</resources>

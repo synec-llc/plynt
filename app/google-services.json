@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "719083642367",
+    "project_id": "plynt-75667",
+    "storage_bucket": "plynt-75667.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:719083642367:android:c70dd2fb545324f06c5bca",
+        "android_client_info": {
+          "package_name": "com.synec.plynt"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "719083642367-7ht6an4gf1hk802kvd1rk58aro1tufg0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.synec.plynt",
+            "certificate_hash": "ac11fb247cb7a41f023512168ede11867896d7a0"
+          }
+        },
+        {
+          "client_id": "719083642367-to6ss2kofnqivefnt5copp2rpr3ghm0s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-SAMqBiW29GWEneVf81Ci_iRzCMvPO8E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "719083642367-to6ss2kofnqivefnt5copp2rpr3ghm0s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

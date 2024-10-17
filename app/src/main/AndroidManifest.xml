@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" >
+
+    <!-- Permissions for Location -->
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <!-- Permissions for Storage -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <!-- Permissions for Microphone -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!-- Permissions for Internet Access -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Permissions for Notifications (Android 13+ requires POST_NOTIFICATIONS) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Permissions for Camera -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <!-- Permissions for Background Processing -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!-- Permissions for Device Clock and Alarms -->
+    <uses-permission android:name="android.permission.SET_ALARM" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@drawable/logo"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Plynt"
+        tools:targetApi="31" >
+
+        <!-- Meta-data for Google Play Services -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+
+        <activity
+            android:name=".bLogInActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Plynt.NoActionBar" />
+        <activity
+            android:name=".bPrivacyPolicyActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Plynt.NoActionBar" >
+        </activity>
+        <activity
+            android:name=".bSignUpConfirmationActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Plynt.NoActionBar" />
+        <activity
+            android:name=".bSignUpActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Plynt.NoActionBar" >
+
+        </activity>
+        <activity
+            android:name=".aSplash2Activity"
+            android:exported="true"
+            android:theme="@style/Theme.Plynt.NoActionBar" />
+        <activity
+            android:name=".aSplashActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Plynt.NoActionBar" >
+
+        </activity>
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Plynt.NoActionBar"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

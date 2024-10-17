@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_feed">
+
+    <fragment
+        android:id="@+id/navigation_feed"
+        android:name="com.synec.plynt.ui.feed.FeedFragment"
+        android:label="@string/title_feed" />
+
+    <fragment
+        android:id="@+id/navigation_plyntify"
+        android:name="com.synec.plynt.ui.plyntify.PlyntifyFragment"
+        android:label="@string/title_plyntify" />
+
+    <fragment
+        android:id="@+id/navigation_search"
+        android:name="com.synec.plynt.ui.search.SearchFragment"
+        android:label="@string/title_search" />
+
+    <fragment
+        android:id="@+id/navigation_account"
+        android:name="com.synec.plynt.ui.account.AccountFragment"
+        android:label="@string/title_account">
+        <action
+            android:id="@+id/action_accountFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment"
+            app:enterAnim="@anim/fade_in_right_fast"
+            app:exitAnim="@anim/fade_out_left_fast"
+            app:popEnterAnim="@anim/fade_in_right_fast"
+            app:popExitAnim="@anim/fade_out_left_fast" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.synec.plynt.ui.settings.SettingsFragment"
+        android:label="Settings" />
+
+</navigation>
