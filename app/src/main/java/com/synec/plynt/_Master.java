@@ -9,6 +9,7 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
@@ -24,7 +25,7 @@ public class _Master {
     public static final SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss.SSSS", Locale.getDefault());
 
     // Global instances of Firestore, Authentication, and Storage
-    public static final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    public static final FirebaseFirestore db;
     public static final FirebaseAuth auth = FirebaseAuth.getInstance();
     public static final FirebaseStorage storage = FirebaseStorage.getInstance();
 
@@ -32,6 +33,15 @@ public class _Master {
     public static final int PREF_MODE = Context.MODE_PRIVATE; // Mode for SharedPreferences
     public static SharedPreferences sharedPreferences;
     public static SharedPreferences.Editor editor;
+
+    static {
+        // Initialize Firestore with offline persistence enabled
+        db = FirebaseFirestore.getInstance();
+        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                .setPersistenceEnabled(true)  // Enable offline caching
+                .build();
+        db.setFirestoreSettings(settings);
+    }
 
     // Method to update a Firestore document using documentID
     public static void updateFirestoreWithDocumentID(Context context, String collectionName, String documentID, String fieldName, Object value) {

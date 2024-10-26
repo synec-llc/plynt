@@ -57,6 +57,10 @@
             android:exported="false"
             android:theme="@style/Theme.Plynt.NoActionBar" />
         <activity
+            android:name=".WebViewActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Plynt.NoActionBar" />
+        <activity
             android:name=".bPrivacyPolicyActivity"
             android:exported="true"
             android:theme="@style/Theme.Plynt.NoActionBar" >

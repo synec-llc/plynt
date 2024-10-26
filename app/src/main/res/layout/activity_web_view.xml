@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Toolbar with title and close button -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/toolbar_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_marginStart="16dp"
+            android:fontFamily="@font/raleway_bold"
+            android:text="Plynt Webview"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/small_heading" />
+
+        <!-- Close button -->
+        <ImageView
+            android:id="@+id/close_button"
+            android:layout_width="@dimen/margin_medium"
+            android:layout_height="@dimen/margin_medium"
+            android:layout_gravity="end"
+            android:layout_marginEnd="@dimen/margin_medium"
+            android:contentDescription="Close"
+            android:src="@drawable/baseline_close_24"
+            android:tint="@android:color/white" />
+
+        <ImageView
+            android:id="@+id/icon_read_news"
+            android:layout_width="@dimen/margin_medium"
+            android:layout_height="@dimen/margin_medium"
+            android:layout_gravity="end"
+            android:layout_marginEnd="@dimen/margin_medium"
+            android:contentDescription="read news"
+            android:src="@drawable/icon_read_news" />
+
+        <ImageView
+            android:id="@+id/icon_read_news_analysis"
+            android:layout_width="@dimen/margin_medium"
+            android:layout_height="@dimen/margin_medium"
+            android:layout_gravity="end"
+            android:layout_marginEnd="@dimen/margin_medium"
+            android:contentDescription="Read news analysis"
+            android:src="@drawable/icon_read_news_analysis" />
+    </androidx.appcompat.widget.Toolbar>
+
+    <!-- WebView to display the content I mean wtf am I writing this comment
+    kaya nga webview diba to display the mobile-view of output from
+    the URL is this necessary is the def of webview something you'll forget
+    in the next 8 days ba see sinayang mo lang 5 minutes nag timpla
+    kanalang sana ng whey protein o whatever :/ -->
+    <WebView
+        android:id="@+id/webView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar"/>
+
+</RelativeLayout>

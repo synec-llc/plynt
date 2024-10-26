@@ -78,6 +78,8 @@ public class bPrivacyPolicyActivity extends AppCompatActivity {
 
 
 
+
+
     private void populatePrivacyTextView() {
         TextView privacyPolicyTextView = findViewById(R.id.privacyPolicyText);
         String privacyPolicy =
