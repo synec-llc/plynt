@@ -15,6 +15,7 @@ import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -24,6 +25,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.synec.plynt.R;
 import com.synec.plynt._Master;
 import com.synec.plynt.adapters.OrderOfTopicsAdapter;
+import com.synec.plynt.functions.DisableBlinkingCursorWhenClickedOutsideClass;
 import com.synec.plynt.functions.ManageOrderOfTopicsTouchHelperClass;
 
 import java.util.ArrayList;
@@ -39,6 +41,7 @@ public class PlyntifyFragment extends Fragment implements ManageOrderOfTopicsTou
     private Context context;
     private MediaPlayer mediaPlayer;
     private Button plyntifyButton;
+    private ConstraintLayout parentLayout;
     SharedPreferences preferences;
     TextInputEditText searchInput;
 
@@ -53,11 +56,13 @@ public class PlyntifyFragment extends Fragment implements ManageOrderOfTopicsTou
 
         // Initialize button and RecyclerView
         plyntifyButton = root.findViewById(R.id.plantPlyntifyButton);
+        parentLayout = root.findViewById(R.id.PlyntifyFragmentParent);
         recyclerView = root.findViewById(R.id.item_topic_recyclerview);
         context = getContext();
         preferences = requireActivity().getSharedPreferences(_Master.PREF_NAME, Context.MODE_PRIVATE);
         searchInput = root.findViewById(R.id.searchInput);
         topicList = new ArrayList<>();
+        new DisableBlinkingCursorWhenClickedOutsideClass(searchInput, parentLayout);
         fillOrderOfTopicList();
 
 
@@ -79,11 +84,16 @@ public class PlyntifyFragment extends Fragment implements ManageOrderOfTopicsTou
             // Check if the enter key is pressed
             if (actionId == EditorInfo.IME_ACTION_DONE ||
                     (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
-                String inputText = searchInput.getText().toString().trim();
+                String inputText = searchInput.getText().toString().trim().toLowerCase();
                 if (!inputText.isEmpty()) {
-                    _Master.addTopicToTheOrderOfTopicList(preferences.getString("session_user_id", ""), inputText, context,
-                            aVoid -> addNewTopic(inputText));
+                    _Master.addTopicToTheOrderOfTopicList(preferences.getString("session_user_id", ""),
+                            preferences.getString("session_full_name", ""),
+                            inputText,
+                            topicList,
+                            context,
+                            aVoid -> addNewTopicInTheFragmentRecyclerView(inputText));
                     searchInput.setText("");
+
 
                     // Hide the keyboard
                     InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -111,11 +121,17 @@ public class PlyntifyFragment extends Fragment implements ManageOrderOfTopicsTou
             setTopicsToTheRecyclerView(topicList);
         });
     }
-    private void addNewTopic(String newTopic){
-        Log.d(TAG, "Topic added successfully in Firestore");
-        topicList.add(newTopic);
-        setTopicsToTheRecyclerView(topicList);
+    public void addNewTopicInTheFragmentRecyclerView(String newTopic) {
+        if (!topicList.contains(newTopic)) { // Check if the topic is already in the list
+            Log.d(TAG, "Topic added successfully in Firestore");
+            topicList.add(newTopic);
+            setTopicsToTheRecyclerView(topicList);
+        } else {
+            Log.d(TAG, "Topic already exists in the list. Not adding.");
+        }
     }
+
+
     private void setTopicsToTheRecyclerView(List<String> finalTopicList){
         adapter = new OrderOfTopicsAdapter(finalTopicList);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));

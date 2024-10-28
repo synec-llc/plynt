@@ -13,15 +13,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.synec.plynt.R;
-import com.synec.plynt.WebViewActivity;
+import com.synec.plynt.functions.PostFeedActionsClass;
 import com.synec.plynt.models.NewsModel;
 
 import java.util.List;
 
 public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder> {
 
-    private List<NewsModel> newsList;
-    private Context context;
+    public List<NewsModel> newsList;
+    public Context context;
+    private static String TAG = "NewsAdapter";
 
     // Constructor
     public NewsAdapter(List<NewsModel> newsList, Context context) {
@@ -39,6 +40,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
     @Override
     public void onBindViewHolder(@NonNull NewsViewHolder holder, int position) {
         NewsModel newsItem = newsList.get(position);
+        PostFeedActionsClass actions = new PostFeedActionsClass(newsList, context, holder);
 
         holder.newsSource.setText(newsItem.getPublisher() != null ? newsItem.getPublisher() : "Unknown Source");
         holder.newsDate.setText(newsItem.getPublishing_date() != null ? newsItem.getPublishing_date() : "Unknown Date");
@@ -64,15 +66,33 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
                 .error(R.drawable.image_not_available)
                 .into(holder.iconSearch);
 
-        // Click Listener to open WebViewActivity with URL
-        holder.itemView.setOnClickListener(v -> {
-            String url = newsItem.getUrl();
-            Log.d("TAGas", "onBindViewHolder: "+ url);
-            if (url != null && !url.isEmpty()) {
-                WebViewActivity.start(context, url);
-            }
-        });
+
+
+        onClicks(actions, newsItem, holder, position);
+
     }
+    private void onClicks(PostFeedActionsClass actions, NewsModel newsItem, NewsViewHolder holder, int position){
+        holder.newsHeadline.setOnClickListener(v -> {
+            String url = newsItem.getUrl();
+            actions.goToWebView(url);
+        });
+        holder.linkCopyIcon.setOnClickListener(v -> {
+            String url = newsItem.getUrl();
+            actions.putURLToClipboard(url);
+        });
+        holder.bookmarkIcon.setOnClickListener(v -> {
+            // a func that accepts the newsItem all data. Then, it will process it to turn i
+            // nto a map with added key "user_id" and to get it is to _Master.sharedPreferences.getString("session_user_id"
+            //then it will call this _Master.addDataToCollection
+            Log.d(TAG, "onClicks: bookmark icon clicked "+newsItem.getDocument_id());
+            actions.storeBookmarkInFirestore(newsItem);
+        });
+
+
+
+    }
+
+
 
     @Override
     public int getItemCount() {
@@ -82,7 +102,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
     public static class NewsViewHolder extends RecyclerView.ViewHolder {
         TextView newsSource, newsDate, newsHeadline, newsBody;
         TextView upvoteCount, downvoteCount, commentsCount;
-        ImageView newsImage, iconSearch;
+        ImageView newsImage, iconSearch, bookmarkIcon, linkCopyIcon;
 
         public NewsViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -95,6 +115,8 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
             upvoteCount = itemView.findViewById(R.id.upvoteCount);
             downvoteCount = itemView.findViewById(R.id.downvoteCount);
             commentsCount = itemView.findViewById(R.id.commentsCount);
+            bookmarkIcon = itemView.findViewById(R.id.icon_bookmark);
+            linkCopyIcon = itemView.findViewById(R.id.icon_link);
         }
     }
 }

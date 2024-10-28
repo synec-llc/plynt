@@ -3,6 +3,7 @@ package com.synec.plynt.models;
 import java.util.List;
 
 public class NewsModel {
+    private String document_id;
     private String ai_org;
     private String ai_region;
     private String ai_tag;
@@ -42,6 +43,14 @@ public class NewsModel {
     // Getters and Setters
     public String getAi_org() {
         return ai_org;
+    }
+
+    public String getDocument_id() {
+        return document_id;
+    }
+
+    public void setDocument_id(String document_id) {
+        this.document_id = document_id;
     }
 
     public void setAi_org(String ai_org) {

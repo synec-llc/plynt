@@ -71,7 +71,10 @@ public class FeedFragment extends Fragment {
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     newsList.clear();
                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        // Create a NewsModel instance and set the document ID
                         NewsModel newsItem = document.toObject(NewsModel.class);
+                        newsItem.setDocument_id(document.getId()); // Set the document ID
+
                         newsList.add(newsItem);
                     }
                     adapter.notifyDataSetChanged();
@@ -80,5 +83,6 @@ public class FeedFragment extends Fragment {
                     Log.e("FeedFragment", "Error fetching data", e);
                     Toast.makeText(getContext(), "Error loading data", Toast.LENGTH_SHORT).show();
                 });
+
     }
 }

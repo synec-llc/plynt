@@ -1,14 +1,18 @@
 package com.synec.plynt;
 
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -40,6 +44,11 @@ public class _Master {
     public static SharedPreferences.Editor editor;
 
     public static List<String> orderOfTopics;
+    private static String userDocumentID;
+    private static String userFullName;
+    private static String topicName;
+    private static OnSuccessListener<Void> callback;
+    ClipboardManager clipboard;
 
     static {
         // Initialize Firestore with offline persistence enabled
@@ -51,8 +60,191 @@ public class _Master {
     }
 
 
+
+
+    public static void addDataToCollection(String collectionName, Map<String, Object> data, final OnSuccessListener<DocumentReference> callback, final OnFailureListener failureCallback) {
+        // Add the data to Firestore with an auto-generated document ID
+        db.collection(collectionName)
+                .add(data)
+                .addOnSuccessListener(documentReference -> {
+                    Log.d("Firestore", "Document added with ID: " + documentReference.getId());
+                    if (callback != null) {
+                        callback.onSuccess(documentReference);  // Notify success
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firestore", "Error adding document", e);
+                    if (failureCallback != null) {
+                        failureCallback.onFailure(e);  // Notify failure
+                    }
+                });
+    }
+    public static boolean isDocumentExistsAccordingToTwoParameters(String collectionName, String field1, String field2, Object field1Value, Object field2Value) {
+        // Initialize a holder for the result, default to false
+        final boolean[] documentExists = {false};
+
+        // Query Firestore for documents matching the specified conditions
+        db.collection(collectionName)
+                .whereEqualTo(field1, field1Value)
+                .whereEqualTo(field2, field2Value)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        // Document(s) found that match the query
+                        documentExists[0] = true;
+                        Log.d("FirestoreQuery", "Document exists in collection: " + collectionName);
+                    } else {
+                        // No matching document found
+                        Log.d("FirestoreQuery", "No document found in collection: " + collectionName);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("FirestoreQuery", "Error querying collection: " + collectionName, e);
+                });
+
+        // Return the result
+        return documentExists[0];
+    }
+
+
+
+
+
+    public static String getCurrentFormattedDateTime() {
+        // Get the current date and time
+        Date currentDate = new Date();
+
+        // Format it using the SimpleDateFormat defined
+        return sdf.format(currentDate);
+    }
+
+    public static void isTopicExisting(String topicName, final OnSuccessListener<Boolean> callback, final OnFailureListener failureCallback) {
+        db.collection("Topics")
+                .whereEqualTo("name", topicName)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    // Check if any document with the specified topic name exists
+                    boolean exists = !queryDocumentSnapshots.isEmpty();
+                    callback.onSuccess(exists);  // Pass result to the callback
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firestore", "Error checking if topic exists", e);
+                    if (failureCallback != null) {
+                        failureCallback.onFailure(e);  // Notify failure if callback is provided
+                    }
+                });
+    }
+
+
+    // Helper function to add a new topic
+    private static void addNewTopic(String userDocumentID, String userFullName, String newTopic, final OnSuccessListener<Void> callback) {
+        // Prepare the data map with required fields
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", newTopic); // Assuming 'newTopic' is the topic name
+        data.put("date_creation", getCurrentFormattedDateTime()); // Your existing date formatter method
+        data.put("popularity_score", null); // Initialize as null if necessary
+
+        // Prepare user information list as a list of maps
+        List<Map<String, String>> users = new ArrayList<>();
+        Map<String, String> userInfo = new HashMap<>();
+        userInfo.put("userDocumentID", userDocumentID);
+        userInfo.put("userFullName", userFullName);
+        users.add(userInfo);
+
+        data.put("users", users); // Add the users list to data map
+
+        // Add the new topic to Firestore
+        addDataToCollection("Topics", data, documentReference -> {
+            Log.d("Firestore", "New topic added successfully with ID: " + documentReference.getId());
+            // Update the order_of_topics field in UserData collection
+            addTopicToUserOrder(userDocumentID, newTopic, callback);
+        }, e -> {
+            Log.e("Firestore", "Error adding new topic to Firestore", e);
+        });
+    }
+
+    // Helper function to update order_of_topics field in UserData
+    private static void addTopicToUserOrder(String userDocumentID, String topicName, final OnSuccessListener<Void> callback) {
+        db.collection("UserData")
+                .document(userDocumentID)
+                .update("order_of_topics", FieldValue.arrayUnion(topicName)) // Add topicName to the order_of_topics array
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("Firestore", "Topic added to user's order_of_topics successfully.");
+                    if (callback != null) {
+                        callback.onSuccess(null); // Notify success
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firestore", "Failed to add topic to user's order_of_topics", e);
+                    if (callback != null) {
+                        callback.onSuccess(null); // Notify failure
+                    }
+                });
+    }
+
+    public static void updateTopicData(String topicId, int popularityScoreAction, String usersAction, List<Map<String, String>> userInfo,
+                                       final OnSuccessListener<Void> callback, final OnFailureListener failureCallback) {
+        DocumentReference topicRef = db.collection("Topics").document(topicId);
+        topicRef.get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        Long currentScore = documentSnapshot.getLong("popularity_score");
+                        if (currentScore == null) currentScore = 0L;
+
+                        long newScore = currentScore + popularityScoreAction;
+
+                        // Prepare the update map
+                        Map<String, Object> updateData = new HashMap<>();
+
+                        updateData.put("popularity_score", newScore); //TODO: Only add this if the userDocID is not found in the updateData map
+
+                        // Step 2: Modify users map
+                        Map<String, Object> userUpdateMap = new HashMap<>();
+                        Log.d("Firestore", "Non update data: " + userInfo.toString());
+                        Log.d("Firestore", "Update data: " + updateData.toString());
+                        Log.d("Firestore", "User Data data: " + userUpdateMap.toString());
+
+                        for (Map<String, String> user : userInfo) {
+                            String userDocumentID = user.get("userDocumentID"); // Access each user's document ID
+
+                            if (usersAction.equals("add")) {
+                                userUpdateMap.put("users." + userDocumentID, user);
+                            } else if (usersAction.equals("neutral")) {
+                                Log.d(TAG, "updateTopicData: NUTRAL, user already recorded to be having this topic");
+//                                userUpdateMap.put("users." + userDocumentID, FieldValue.delete());
+                            }
+                        }
+
+                        // Merge updateData with userUpdateMap
+                        updateData.putAll(userUpdateMap);
+
+                        // Step 3: Update Firestore document with both updates
+                        topicRef.update(updateData)
+                                .addOnSuccessListener(aVoid -> {
+                                    Log.d("Firestore", "Topic data updated successfully.");
+                                    if (callback != null) {
+                                        callback.onSuccess(null);  // Notify success
+                                    }
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e("Firestore", "Error updating topic data", e);
+                                    if (failureCallback != null) {
+                                        failureCallback.onFailure(e);  // Notify failure
+                                    }
+                                });
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firestore", "Failed to retrieve topic document", e);
+                    if (failureCallback != null) {
+                        failureCallback.onFailure(e);  // Notify failure
+                    }
+                });
+    }
+
+
     public static void getOrderOfTopics(String userDocumentID, Context context, final OnSuccessListener<List<String>> callback) {
-        Log.d(TAG, "getOrderOfTopics: "+userDocumentID);
+        Log.d(TAG, "getOrderOfTopics: " + userDocumentID);
         db.collection("UserData")
                 .document(userDocumentID)
                 .get()
@@ -75,6 +267,7 @@ public class _Master {
                     callback.onSuccess(new ArrayList<>());  // Return an empty list on failure
                 });
     }
+
     public static void updateOrderOfTopics(String userDocumentID, Context context, List<String> newOrderOfTopics, final OnSuccessListener<Void> callback) {
         Log.d(TAG, "updateOrderOfTopics: " + userDocumentID);
 
@@ -95,10 +288,74 @@ public class _Master {
                     callback.onSuccess(null);  // Notify failure
                 });
     }
-    public static void addTopicToTheOrderOfTopicList(String userDocumentID, String newTopic, Context context, final OnSuccessListener<Void> callback) {
+
+    public static void addTopicToTheOrderOfTopicList(String userDocumentID, String userFullName, String newTopic, List<String> currentTopicList, Context context, final OnSuccessListener<Void> callback) {
         Log.d(TAG, "addTopicToTheOrderOfTopicList: " + userDocumentID);
 
-        // Reference to the user's document in Firestore
+        // Check if the topic already exists in the Topics collection
+        isTopicExisting(newTopic, exists -> {
+            if (exists) {
+                // If the topic exists, update it
+                Log.d(TAG, "addTopicToTheOrderOfTopicList: " + newTopic + " Topic is existing in the dataset Topics Collection");
+
+                if (!currentTopicList.contains(newTopic)) {
+                    Log.d(TAG, "addTopicToTheOrderOfTopicList: Topic is not in the users order of topics " + newTopic);
+                    updateUserOrderOfTopics(userDocumentID, newTopic, callback);
+                } else {
+                    Log.d(TAG, "addTopicToTheOrderOfTopicList: Topic is in the users order of topics " + newTopic);
+                    updateExistingTopic(userDocumentID, userFullName, newTopic, callback);
+                    Toast.makeText(context, "Topic already exists", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                // If the topic doesn't exist, add it to the collection
+                Log.d(TAG, "addTopicToTheOrderOfTopicList: " + newTopic + " Topic is unique");
+                addNewTopic(userDocumentID, userFullName, newTopic, callback);
+            }
+        }, e -> {
+            Log.e(TAG, "Error checking if topic exists", e);
+            callback.onSuccess(null); // Notify failure
+        });
+    }
+
+    // Helper function to update an existing topic
+    private static void updateExistingTopic(String userDocumentID, String userFullName, String topicName, final OnSuccessListener<Void> callback) {
+        db.collection("Topics")
+                .whereEqualTo("name", topicName)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (!querySnapshot.isEmpty()) {
+                        // Assuming there's only one document with this topic name
+                        String topicId = querySnapshot.getDocuments().get(0).getId();
+
+                        // Prepare user information as a list of maps
+                        List<Map<String, String>> userInformation = new ArrayList<>();
+                        Map<String, String> userInfo = new HashMap<>();
+                        userInfo.put("userDocumentID", userDocumentID);
+                        userInfo.put("userFullName", userFullName);
+                        userInformation.add(userInfo);
+
+                        // Update the topic document with the new user information and popularity score
+                        updateTopicData(topicId, 1, "add", userInformation, aVoid -> {
+                            Log.d(TAG, "Existing topic updated successfully in the Topics Collection.");
+//                            updateUserOrderOfTopics(userDocumentID, topicName, callback);
+                        }, e -> {
+                            Log.e(TAG, "Failed to update existing topic", e);
+                            callback.onSuccess(null); // Notify failure
+                        });
+                    } else {
+                        Log.e(TAG, "Topic not found: " + topicName);
+                        callback.onSuccess(null); // Notify failure if topic doesn't exist
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Failed to retrieve topic document", e);
+                    callback.onSuccess(null); // Notify failure
+                });
+    }
+
+
+    // Helper function to update user's order_of_topics list
+    private static void updateUserOrderOfTopics(String userDocumentID, String newTopic, final OnSuccessListener<Void> callback) {
         db.collection("UserData")
                 .document(userDocumentID)
                 .get()
@@ -116,22 +373,24 @@ public class _Master {
                     // Prepare the data to update in Firestore
                     Map<String, Object> updateData = new HashMap<>();
                     updateData.put("order_of_topics", currentOrderOfTopics);
+                    Log.d(TAG, "updateUserOrderOfTopics: newTopicTOTheUser " + newTopic);
+                    Log.d(TAG, "updateUserOrderOfTopics: updateDataTOTheUser " + updateData);
 
                     // Update the document
                     db.collection("UserData")
                             .document(userDocumentID)
                             .update(updateData)
                             .addOnSuccessListener(aVoid -> {
-                                Log.d(TAG, "Topic added successfully: " + newTopic);
+                                Log.d(TAG, "User's order of topics updated successfully.");
                                 callback.onSuccess(null);  // Notify success
                             })
                             .addOnFailureListener(e -> {
-                                Log.e(TAG, "Failed to add topic to Order of Topics", e);
+                                Log.e(TAG, "Failed to update user's order of topics", e);
                                 callback.onSuccess(null);  // Notify failure
                             });
                 })
                 .addOnFailureListener(e -> {
-                    Log.e(TAG, "Failed to retrieve current Order of Topics", e);
+                    Log.e(TAG, "Failed to retrieve current order_of_topics", e);
                     callback.onSuccess(null);  // Notify failure
                 });
     }
@@ -157,7 +416,8 @@ public class _Master {
                     System.err.println("Error updating document with documentID: " + documentID + " - " + e.getMessage());
                 });
     }
-    public static void clearSharedPreferences(){
+
+    public static void clearSharedPreferences() {
         editor.clear();
         editor.apply();
         Log.d("Clear SharedSreferences", "Done");
@@ -200,6 +460,7 @@ public class _Master {
                             // Save session data to SharedPreferences
                             saveSessionDataToSharedPreferences(context, sessionData);
                             showAllSharedPreferences(context, "Session Refresh ");
+//                            AccountFragment.newInstance().setupViewsAccountFragment();
                         } else {
                             Toast.makeText(context, "Something went wrong. Please log in again.", Toast.LENGTH_SHORT).show();
                             clearSharedPreferences();
@@ -266,9 +527,9 @@ public class _Master {
                             // Redirect to bPrivacyPolicyActivity
                             Log.d("LogIn", "Successfully logged in: " + document.getString("full_name"));
                             Intent intent;
-                            if (document.getString("agreed_to_privacy_policy_date")==null){
+                            if (document.getString("agreed_to_privacy_policy_date") == null) {
                                 intent = new Intent(context, bPrivacyPolicyActivity.class);
-                            }else {
+                            } else {
                                 intent = new Intent(context, MainActivity.class);
                             }
                             context.startActivity(intent);
@@ -282,35 +543,37 @@ public class _Master {
                     }
                 });
     }
+
     private static void saveSessionDataToSharedPreferences(Context context, Map<String, Object> sessionData) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(PREF_NAME, PREF_MODE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         // Iterate through sessionData and store each key-value pair in SharedPreferences
-            for (Map.Entry<String, Object> entry : sessionData.entrySet()) {
-                String key = entry.getKey();
-                Object value = entry.getValue();
+        for (Map.Entry<String, Object> entry : sessionData.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
 
-                if (value instanceof String) {
-                    editor.putString(key, (String) value);
-                } else if (value instanceof Boolean) {
-                    editor.putBoolean(key, (Boolean) value);
-                } else if (value instanceof Long) {
-                    editor.putLong(key, (Long) value);
-                } else if (value instanceof Integer) {
-                    editor.putInt(key, (Integer) value);
-                }
+            if (value instanceof String) {
+                editor.putString(key, (String) value);
+            } else if (value instanceof Boolean) {
+                editor.putBoolean(key, (Boolean) value);
+            } else if (value instanceof Long) {
+                editor.putLong(key, (Long) value);
+            } else if (value instanceof Integer) {
+                editor.putInt(key, (Integer) value);
+            }
 
 //                Set<String> orderOfTopicsSet = new HashSet<>(orderOfTopics);
 //                Set<String> orderOfTopicsSet = new LinkedHashSet<>(orderOfTopics);
 //                editor.putStringSet("session_order_of_topics", orderOfTopicsSet);
 
-                String jsonOrderOfTopics = new Gson().toJson(orderOfTopics);
-                editor.putString("session_order_of_topics", jsonOrderOfTopics);
+            String jsonOrderOfTopics = new Gson().toJson(orderOfTopics);
+            editor.putString("session_order_of_topics", jsonOrderOfTopics);
         }
         // Apply changes to SharedPreferences
         editor.apply();
     }
+
     // Function to generate a unique 30-character session ID
     public static String generateSessionID(int length) {
         String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -323,6 +586,7 @@ public class _Master {
 
         return sessionId.toString();
     }
+
     public static void showAllSharedPreferences(Context context, String TAG) {
         sharedPreferences = context.getSharedPreferences(PREF_NAME, PREF_MODE);
         editor = sharedPreferences.edit();
@@ -331,20 +595,18 @@ public class _Master {
         Map<String, ?> allEntries = sharedPreferences.getAll();
 
         if (allEntries.isEmpty()) {
-            Log.d("SharedPreferences_"+TAG, "No session data found in SharedPreferences.");
+            Log.d("SharedPreferences_" + TAG, "No session data found in SharedPreferences.");
             Toast.makeText(context, "No session data found.", Toast.LENGTH_SHORT).show();
         } else {
             // Loop through the entries and log each one
             for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
-                Log.d("SharedPreferences_"+TAG, entry.getKey() + ": " + entry.getValue().toString());
+                Log.d("SharedPreferences_" + TAG, entry.getKey() + ": " + entry.getValue().toString());
             }
 
             // Optionally, show a Toast to confirm the session details
 //            Toast.makeText(context, "Session data loaded. Check logs for details.", Toast.LENGTH_SHORT).show();
         }
     }
-
-
 
 
     // Method to update a Firestore document based on two field values
