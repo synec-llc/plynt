@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -13,9 +14,12 @@ import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.gson.Gson;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
@@ -23,7 +27,7 @@ import java.util.Random;
 public class _Master {
     // Define the SimpleDateFormat with milliseconds included
     public static final SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss.SSSS", Locale.getDefault());
-
+    private static String TAG = "_Master";
     // Global instances of Firestore, Authentication, and Storage
     public static final FirebaseFirestore db;
     public static final FirebaseAuth auth = FirebaseAuth.getInstance();
@@ -31,8 +35,11 @@ public class _Master {
 
     public static final String PREF_NAME = "currentSession"; // SharedPreferences name
     public static final int PREF_MODE = Context.MODE_PRIVATE; // Mode for SharedPreferences
+    public static final String PREF_PLAYBACK_STATE = "isPlaying"; // Key for playback state
     public static SharedPreferences sharedPreferences;
     public static SharedPreferences.Editor editor;
+
+    public static List<String> orderOfTopics;
 
     static {
         // Initialize Firestore with offline persistence enabled
@@ -42,6 +49,93 @@ public class _Master {
                 .build();
         db.setFirestoreSettings(settings);
     }
+
+
+    public static void getOrderOfTopics(String userDocumentID, Context context, final OnSuccessListener<List<String>> callback) {
+        Log.d(TAG, "getOrderOfTopics: "+userDocumentID);
+        db.collection("UserData")
+                .document(userDocumentID)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        // Get the ordered list directly from Firestore
+                        List<String> orderOfTopics = (List<String>) documentSnapshot.get("order_of_topics");
+                        if (orderOfTopics != null) {
+                            Log.d(TAG, "Order of Topics: " + orderOfTopics.toString());
+                            callback.onSuccess(new ArrayList<>(orderOfTopics));  // Return a copy of the list to maintain order
+                        } else {
+                            callback.onSuccess(new ArrayList<>());  // Return an empty list if none found
+                        }
+                    } else {
+                        callback.onSuccess(new ArrayList<>());
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Failed to retrieve topics", e);
+                    callback.onSuccess(new ArrayList<>());  // Return an empty list on failure
+                });
+    }
+    public static void updateOrderOfTopics(String userDocumentID, Context context, List<String> newOrderOfTopics, final OnSuccessListener<Void> callback) {
+        Log.d(TAG, "updateOrderOfTopics: " + userDocumentID);
+
+        // Prepare the data to update in Firestore
+        Map<String, Object> updateData = new HashMap<>();
+        updateData.put("order_of_topics", newOrderOfTopics);
+
+        // Update the document
+        db.collection("UserData")
+                .document(userDocumentID)
+                .update(updateData)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Order of Topics updated successfully: " + newOrderOfTopics);
+                    callback.onSuccess(null);  // Notify success
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Failed to update Order of Topics", e);
+                    callback.onSuccess(null);  // Notify failure
+                });
+    }
+    public static void addTopicToTheOrderOfTopicList(String userDocumentID, String newTopic, Context context, final OnSuccessListener<Void> callback) {
+        Log.d(TAG, "addTopicToTheOrderOfTopicList: " + userDocumentID);
+
+        // Reference to the user's document in Firestore
+        db.collection("UserData")
+                .document(userDocumentID)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    // Retrieve the current order_of_topics array
+                    List<String> currentOrderOfTopics = (List<String>) documentSnapshot.get("order_of_topics");
+
+                    if (currentOrderOfTopics == null) {
+                        currentOrderOfTopics = new ArrayList<>(); // Initialize if null
+                    }
+
+                    // Add the new topic to the list
+                    currentOrderOfTopics.add(newTopic);
+
+                    // Prepare the data to update in Firestore
+                    Map<String, Object> updateData = new HashMap<>();
+                    updateData.put("order_of_topics", currentOrderOfTopics);
+
+                    // Update the document
+                    db.collection("UserData")
+                            .document(userDocumentID)
+                            .update(updateData)
+                            .addOnSuccessListener(aVoid -> {
+                                Log.d(TAG, "Topic added successfully: " + newTopic);
+                                callback.onSuccess(null);  // Notify success
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e(TAG, "Failed to add topic to Order of Topics", e);
+                                callback.onSuccess(null);  // Notify failure
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Failed to retrieve current Order of Topics", e);
+                    callback.onSuccess(null);  // Notify failure
+                });
+    }
+
 
     // Method to update a Firestore document using documentID
     public static void updateFirestoreWithDocumentID(Context context, String collectionName, String documentID, String fieldName, Object value) {
@@ -100,6 +194,8 @@ public class _Master {
                             sessionData.put("session_birthday", document.getString("birthday"));
                             sessionData.put("session_age", document.getLong("age"));
                             sessionData.put("session_agreed_to_privacy_policy_date", document.getString("agreed_to_privacy_policy_date"));
+                            // Assuming order_of_topics is an array in your Firestore document
+                            orderOfTopics = (List<String>) document.get("order_of_topics");
 
                             // Save session data to SharedPreferences
                             saveSessionDataToSharedPreferences(context, sessionData);
@@ -116,6 +212,7 @@ public class _Master {
                     }
                 });
     }
+
 
     public static void getUserDataAndStoreSession(Context context, String email, String userId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -153,6 +250,10 @@ public class _Master {
                             sessionData.put("session_birthday", document.getString("birthday"));
                             sessionData.put("session_age", document.getLong("age"));
                             sessionData.put("session_agreed_to_privacy_policy_date", document.getString("agreed_to_privacy_policy_date"));
+                            // Assuming order_of_topics is an array in your Firestore document
+                            orderOfTopics = (List<String>) document.get("order_of_topics");
+
+//                            sessionData.put("session_order_of_topics", orderOfTopicsSet);
 
                             // Save session data to SharedPreferences
                             saveSessionDataToSharedPreferences(context, sessionData);
@@ -164,8 +265,14 @@ public class _Master {
 
                             // Redirect to bPrivacyPolicyActivity
                             Log.d("LogIn", "Successfully logged in: " + document.getString("full_name"));
-                            Intent intent = new Intent(context, bPrivacyPolicyActivity.class);
+                            Intent intent;
+                            if (document.getString("agreed_to_privacy_policy_date")==null){
+                                intent = new Intent(context, bPrivacyPolicyActivity.class);
+                            }else {
+                                intent = new Intent(context, MainActivity.class);
+                            }
                             context.startActivity(intent);
+
                         } else {
                             Toast.makeText(context, "No user data found. Log in failed!", Toast.LENGTH_SHORT).show();
                         }
@@ -180,19 +287,26 @@ public class _Master {
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         // Iterate through sessionData and store each key-value pair in SharedPreferences
-        for (Map.Entry<String, Object> entry : sessionData.entrySet()) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
+            for (Map.Entry<String, Object> entry : sessionData.entrySet()) {
+                String key = entry.getKey();
+                Object value = entry.getValue();
 
-            if (value instanceof String) {
-                editor.putString(key, (String) value);
-            } else if (value instanceof Boolean) {
-                editor.putBoolean(key, (Boolean) value);
-            } else if (value instanceof Long) {
-                editor.putLong(key, (Long) value);
-            } else if (value instanceof Integer) {
-                editor.putInt(key, (Integer) value);
-            }
+                if (value instanceof String) {
+                    editor.putString(key, (String) value);
+                } else if (value instanceof Boolean) {
+                    editor.putBoolean(key, (Boolean) value);
+                } else if (value instanceof Long) {
+                    editor.putLong(key, (Long) value);
+                } else if (value instanceof Integer) {
+                    editor.putInt(key, (Integer) value);
+                }
+
+//                Set<String> orderOfTopicsSet = new HashSet<>(orderOfTopics);
+//                Set<String> orderOfTopicsSet = new LinkedHashSet<>(orderOfTopics);
+//                editor.putStringSet("session_order_of_topics", orderOfTopicsSet);
+
+                String jsonOrderOfTopics = new Gson().toJson(orderOfTopics);
+                editor.putString("session_order_of_topics", jsonOrderOfTopics);
         }
         // Apply changes to SharedPreferences
         editor.apply();
@@ -229,6 +343,7 @@ public class _Master {
 //            Toast.makeText(context, "Session data loaded. Check logs for details.", Toast.LENGTH_SHORT).show();
         }
     }
+
 
 
 

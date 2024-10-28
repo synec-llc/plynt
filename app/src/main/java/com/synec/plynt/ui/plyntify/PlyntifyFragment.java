@@ -1,36 +1,46 @@
 package com.synec.plynt.ui.plyntify;
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.drawable.ColorDrawable;
+import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.textfield.TextInputEditText;
 import com.synec.plynt.R;
+import com.synec.plynt._Master;
 import com.synec.plynt.adapters.OrderOfTopicsAdapter;
+import com.synec.plynt.functions.ManageOrderOfTopicsTouchHelperClass;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlyntifyFragment extends Fragment {
+public class PlyntifyFragment extends Fragment implements ManageOrderOfTopicsTouchHelperClass.OnOrderChangedListener {
 
+    private String TAG = "PlyntifyFragment";
     private PlyntifyViewModel mViewModel;
     private RecyclerView recyclerView;
     private OrderOfTopicsAdapter adapter;
     private List<String> topicList;
     private Context context;
+    private MediaPlayer mediaPlayer;
+    private Button plyntifyButton;
+    SharedPreferences preferences;
+    TextInputEditText searchInput;
 
     public static PlyntifyFragment newInstance() {
         return new PlyntifyFragment();
@@ -41,99 +51,141 @@ public class PlyntifyFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_plyntify, container, false);
 
+        // Initialize button and RecyclerView
+        plyntifyButton = root.findViewById(R.id.plantPlyntifyButton);
         recyclerView = root.findViewById(R.id.item_topic_recyclerview);
         context = getContext();
+        preferences = requireActivity().getSharedPreferences(_Master.PREF_NAME, Context.MODE_PRIVATE);
+        searchInput = root.findViewById(R.id.searchInput);
         topicList = new ArrayList<>();
-        topicList.add("Typhoons");
-        topicList.add("Science and Technology");
-        topicList.add("Politics");
-        topicList.add("Carlos Yulo");
-        topicList.add("Business and Finance");
+        fillOrderOfTopicList();
 
-        adapter = new OrderOfTopicsAdapter(topicList);
-        recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        recyclerView.setAdapter(adapter);
 
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(itemTouchCallback);
-        itemTouchHelper.attachToRecyclerView(recyclerView);
+        // MediaPlayer and button setup (same as before)
+        boolean isPlaying = preferences.getBoolean(_Master.PREF_PLAYBACK_STATE, false);
+        int savedPosition = preferences.getInt("currentAudioPosition", 0);
+        if (isPlaying) {
+            initializeMediaPlayer();
+            mediaPlayer.seekTo(savedPosition);
+            mediaPlayer.start();
+            plyntifyButton.setText("Pause");
+        } else {
+            plyntifyButton.setText("Play Plyntify");
+        }
+        plyntifyButton.setOnClickListener(v -> togglePlayPause());
+
+
+        searchInput.setOnEditorActionListener((v, actionId, event) -> {
+            // Check if the enter key is pressed
+            if (actionId == EditorInfo.IME_ACTION_DONE ||
+                    (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
+                String inputText = searchInput.getText().toString().trim();
+                if (!inputText.isEmpty()) {
+                    _Master.addTopicToTheOrderOfTopicList(preferences.getString("session_user_id", ""), inputText, context,
+                            aVoid -> addNewTopic(inputText));
+                    searchInput.setText("");
+
+                    // Hide the keyboard
+                    InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+                    if (imm != null) {
+                        imm.hideSoftInputFromWindow(searchInput.getWindowToken(), 0);
+                    }
+                }
+                return true;  // Indicate that the event was handled
+            }
+            return false;
+        });
 
         return root;
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(PlyntifyViewModel.class);
+
+    public void fillOrderOfTopicList() {
+        Log.d(TAG, "session doc id: " + preferences.getString("session_user_id", ""));
+        _Master.getOrderOfTopics(preferences.getString("session_user_id", ""), context, orderOfTopics -> {
+            for (String topic : orderOfTopics) {
+                Log.d("PlyntifyFragment", "Topic: " + topic);
+                topicList.add(topic);
+            }
+
+            setTopicsToTheRecyclerView(topicList);
+        });
+    }
+    private void addNewTopic(String newTopic){
+        Log.d(TAG, "Topic added successfully in Firestore");
+        topicList.add(newTopic);
+        setTopicsToTheRecyclerView(topicList);
+    }
+    private void setTopicsToTheRecyclerView(List<String> finalTopicList){
+        adapter = new OrderOfTopicsAdapter(finalTopicList);
+        recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        recyclerView.setAdapter(adapter);
+
+        // Set up swipe and drag feature with custom ItemTouchHelper
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ManageOrderOfTopicsTouchHelperClass(adapter, topicList, context, this));
+        itemTouchHelper.attachToRecyclerView(recyclerView);
     }
 
-    ItemTouchHelper.Callback itemTouchCallback = new ItemTouchHelper.Callback() {
-        @Override
-        public boolean isLongPressDragEnabled() {
-            return true;
+    @Override
+    public void onOrderChanged(List<String> newOrder) {
+        Log.d(TAG, "Updated topic order: " + newOrder);
+
+        // Call updateOrderOfTopics and handle success or failure in the callback
+        _Master.updateOrderOfTopics(
+                preferences.getString("session_user_id", ""),
+                context,
+                newOrder,
+                aVoid -> Log.d(TAG, "Order of topics successfully updated in Firestore")
+        );
+    }
+
+
+    private void initializeMediaPlayer() {
+        if (mediaPlayer == null) {
+            mediaPlayer = MediaPlayer.create(context, R.raw.sample_audio_1);
+            mediaPlayer.setOnCompletionListener(mp -> {
+                plyntifyButton.setText("Play Plyntify");
+                savePlaybackState(false, 0);
+            });
+        }
+    }
+
+    private void togglePlayPause() {
+        if (mediaPlayer == null) {
+            initializeMediaPlayer();
         }
 
-        @Override
-        public boolean isItemViewSwipeEnabled() {
-            return true;
+        if (mediaPlayer.isPlaying()) {
+            int position = mediaPlayer.getCurrentPosition();
+            mediaPlayer.pause();
+            plyntifyButton.setText("Continue Playing");
+            savePlaybackState(false, position);
+        } else {
+            mediaPlayer.start();
+            plyntifyButton.setText("Pause");
+            savePlaybackState(true, mediaPlayer.getCurrentPosition());
         }
+    }
 
-        @Override
-        public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
-            int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
-            int swipeFlags = ItemTouchHelper.START;  // Left swipe only
-            return makeMovementFlags(dragFlags, swipeFlags);
+    private void savePlaybackState(boolean isPlaying, int position) {
+        SharedPreferences preferences = requireActivity().getSharedPreferences(_Master.PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(_Master.PREF_PLAYBACK_STATE, isPlaying);
+        editor.putInt("currentAudioPosition", position);
+        editor.apply();
+    }
+
+    private void releaseMediaPlayer() {
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+            mediaPlayer = null;
+            savePlaybackState(false, 0);
         }
+    }
 
-        @Override
-        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder,
-                              @NonNull RecyclerView.ViewHolder target) {
-            int fromPosition = viewHolder.getAdapterPosition();
-            int toPosition = target.getAdapterPosition();
-            adapter.swapItems(fromPosition, toPosition);
-            return true;
-        }
-
-        @Override
-        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-            int position = viewHolder.getAdapterPosition();
-            topicList.remove(position);
-            adapter.notifyItemRemoved(position);
-        }
-
-        @Override
-        public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView,
-                                @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY,
-                                int actionState, boolean isCurrentlyActive) {
-            if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
-                View itemView = viewHolder.itemView;
-
-                // Draw red background
-                ColorDrawable background = new ColorDrawable(Color.RED);
-                background.setBounds(itemView.getRight() + (int) dX, itemView.getTop(),
-                        itemView.getRight(), itemView.getBottom());
-                background.draw(c);
-
-                // Draw "Delete" text
-                Paint textPaint = new Paint();
-                textPaint.setColor(Color.WHITE);
-                textPaint.setTextSize(40);
-                textPaint.setTextAlign(Paint.Align.CENTER);
-                float textY = itemView.getTop() + (itemView.getHeight() / 2) + (textPaint.descent() - textPaint.ascent()) / 4;
-                c.drawText("Delete", itemView.getRight() - 150, textY, textPaint);
-
-                // Fade out item as it's swiped
-                itemView.setAlpha(1.0f - Math.abs(dX) / (float) itemView.getWidth());
-                itemView.setTranslationX(dX);
-            } else {
-                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-            }
-        }
-
-        @Override
-        public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
-            super.clearView(recyclerView, viewHolder);
-            viewHolder.itemView.setAlpha(1.0f);  // Restore full opacity
-            viewHolder.itemView.setTranslationX(0);  // Reset translation
-        }
-    };
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        releaseMediaPlayer();
+    }
 }

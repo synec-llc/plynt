@@ -18,6 +18,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static String TAG = "MainActivity";
     private ActivityMainBinding binding;
+//    public SharedPreferences preferences = MainActivity.this.getSharedPreferences(_Master.PREF_NAME, Context.MODE_PRIVATE);
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
