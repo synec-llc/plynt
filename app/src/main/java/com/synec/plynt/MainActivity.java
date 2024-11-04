@@ -2,6 +2,7 @@ package com.synec.plynt;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -12,6 +13,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.synec.plynt.databinding.ActivityMainBinding;
+import com.synec.plynt.functions.GPTCallClass;
 import com.synec.plynt.helpers.PermissionsHelper;
 
 public class MainActivity extends AppCompatActivity {
@@ -19,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
     private static String TAG = "MainActivity";
     private ActivityMainBinding binding;
 //    public SharedPreferences preferences = MainActivity.this.getSharedPreferences(_Master.PREF_NAME, Context.MODE_PRIVATE);
-
+private TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,8 +78,17 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+        textView = findViewById(R.id.textView);
+        String inputText = "Hello, Llama!";
+
+//        GeminiAPICall geminiAPI = new GeminiAPICall();
+//        geminiAPI.sendRequest("write a poem");
+
+        GPTCallClass gptCall = new GPTCallClass(MainActivity.this);
+        gptCall.sendRequest("Write a 100 word poem about clouds");
 
     }
+    
 
     @Override
     public boolean onSupportNavigateUp() {

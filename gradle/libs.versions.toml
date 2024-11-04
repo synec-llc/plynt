@@ -17,7 +17,8 @@ firebaseFirestore = "25.1.0"
 firebaseAuth = "23.0.0"
 googleAuth = "20.7.0"
 firebaseStorage = "21.0.1"
-legacySupportV4 = "1.0.0"  # The version of Google Play Services Auth you want to use
+legacySupportV4 = "1.0.0"
+cronetEmbedded = "119.6045.31"  # The version of Google Play Services Auth you want to use
 
 
 [libraries]
@@ -38,6 +39,7 @@ firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version
 google-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "googleAuth" }
 firebase-storage = { group = "com.google.firebase", name = "firebase-storage", version.ref = "firebaseStorage" }
 legacy-support-v4 = { group = "androidx.legacy", name = "legacy-support-v4", version.ref = "legacySupportV4" }
+cronet-embedded = { group = "org.chromium.net", name = "cronet-embedded", version.ref = "cronetEmbedded" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -67,7 +68,7 @@ public class _Master {
         db.collection(collectionName)
                 .add(data)
                 .addOnSuccessListener(documentReference -> {
-                    Log.d("Firestore", "Document added with ID: " + documentReference.getId());
+                    Log.d("Firestore", "Document added with ID: " + documentReference.getId() +" "+ collectionName);
                     if (callback != null) {
                         callback.onSuccess(documentReference);  // Notify success
                     }
@@ -79,9 +80,35 @@ public class _Master {
                     }
                 });
     }
-    public static boolean isDocumentExistsAccordingToTwoParameters(String collectionName, String field1, String field2, Object field1Value, Object field2Value) {
-        // Initialize a holder for the result, default to false
-        final boolean[] documentExists = {false};
+    public static void deleteDocumentById(String collectionName, String documentId, Context context, ImageView imageIcon,
+                                          int imageIconUpdateResourceID) {
+        db.collection(collectionName).document(documentId)
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("FirestoreDelete", "Document deleted successfully from collection: " + collectionName);
+                    Toast.makeText(context, "Document deleted successfully!", Toast.LENGTH_SHORT).show();
+                    imageIcon.setImageResource(imageIconUpdateResourceID);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("FirestoreDelete", "Error deleting document from collection: " + collectionName, e);
+                    Toast.makeText(context, "Failed to delete document: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+
+
+    public interface OnDocumentExistsCallback {
+        void onResult(String documentId);
+    }
+
+    public static void isDocumentExistsAccordingToTwoParameters(
+            String collectionName,
+            String field1,
+            String field2,
+            Object field1Value,
+            Object field2Value,
+            ImageView imageIcon,
+            int imageIconUpdateResourceID,
+            OnDocumentExistsCallback callback) {
 
         // Query Firestore for documents matching the specified conditions
         db.collection(collectionName)
@@ -90,21 +117,29 @@ public class _Master {
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     if (!queryDocumentSnapshots.isEmpty()) {
-                        // Document(s) found that match the query
-                        documentExists[0] = true;
-                        Log.d("FirestoreQuery", "Document exists in collection: " + collectionName);
+                        // Get the first matching document's ID
+                        String documentId = queryDocumentSnapshots.getDocuments().get(0).getId();
+                        Log.d(TAG, "Document exists in collection: " + collectionName + ", Document ID: " + documentId);
+
+                        // Uncomment this line if you want to update the ImageView icon when a document is found
+                        // imageIcon.setImageResource(imageIconUpdateResourceID);
+
+                        // Trigger the callback with the document ID
+                        callback.onResult(documentId);
                     } else {
                         // No matching document found
-                        Log.d("FirestoreQuery", "No document found in collection: " + collectionName);
+                        Log.d(TAG, "No document found in collection: " + collectionName);
+                        // Trigger the callback with `null`
+                        callback.onResult(null);
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("FirestoreQuery", "Error querying collection: " + collectionName, e);
+                    Log.e(TAG, "Error querying collection: " + collectionName, e);
+                    // Trigger the callback with `null` in case of an error
+                    callback.onResult(null);
                 });
-
-        // Return the result
-        return documentExists[0];
     }
+
 
 
 

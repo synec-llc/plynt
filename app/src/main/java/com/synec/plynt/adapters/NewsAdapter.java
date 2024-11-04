@@ -9,10 +9,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.synec.plynt.R;
+import com.synec.plynt._Master;
 import com.synec.plynt.functions.PostFeedActionsClass;
 import com.synec.plynt.models.NewsModel;
 
@@ -60,18 +62,72 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
                 .load(newsItem.getImage_url())
                 .error(R.drawable.image_not_available)
                 .into(holder.newsImage);
-
         Glide.with(holder.itemView.getContext())
                 .load(newsItem.getSource_icon())
                 .error(R.drawable.image_not_available)
                 .into(holder.iconSearch);
 
-
-
         onClicks(actions, newsItem, holder, position);
 
+//        String[] reactionsList = ["upvote", "downvote", "bookmark"];
+        _Master.isDocumentExistsAccordingToTwoParameters(
+                "Reactions",
+                "user_document_id",
+                "article_id",
+                _Master.sharedPreferences.getString("session_user_id", ""),
+                newsItem.getArticle_id(),   // field2Value
+                holder.upvoteIcon,         // imageIcon
+                R.drawable.icon_upvote_yellow,
+                documentId -> {              // callback
+                    if (documentId == null) {
+                        holder.upvoteIcon.setImageResource(R.drawable.icon_upvote);
+                    } else {
+                        holder.upvoteIcon.setImageResource(R.drawable.icon_upvote_yellow);
+                        Log.d(TAG, "storeReactionsInFirestore: Upvote already exists for this user and article. Document ID: " + documentId);
+                    }
+                }
+        );
+        _Master.isDocumentExistsAccordingToTwoParameters(
+                "Reactions",
+                "user_document_id",
+                "article_id",
+                _Master.sharedPreferences.getString("session_user_id", ""),
+                newsItem.getArticle_id(),   // field2Value
+                holder.downvoteIcon,         // imageIcon
+                R.drawable.icon_downvote_yellow,
+                documentId -> {              // callback
+                    if (documentId == null) {
+                        holder.downvoteIcon.setImageResource(R.drawable.icon_downvote);
+                    } else {
+                        holder.downvoteIcon.setImageResource(R.drawable.icon_downvote_yellow);
+                        Log.d(TAG, "storeReactionsInFirestore: Upvote already exists for this user and article. Document ID: " + documentId);
+                    }
+                }
+        );
+        _Master.isDocumentExistsAccordingToTwoParameters(
+                "Reactions",
+                "user_document_id",
+                "article_id",
+                _Master.sharedPreferences.getString("session_user_id", ""),
+                newsItem.getArticle_id(),   // field2Value
+                holder.bookmarkIcon,         // imageIcon
+                R.drawable.icon_bookmark_marked,
+                documentId -> {              // callback
+                    if (documentId == null) {
+                        // No document exists, update the icon to unmarked
+                        holder.bookmarkIcon.setImageResource(R.drawable.icon_bookmark_unmarked);
+                    } else {
+                        // Document already exists, update the icon to marked
+                        holder.bookmarkIcon.setImageResource(R.drawable.icon_bookmark_marked);
+                        Log.d(TAG, "storeReactionsInFirestore: Bookmark already exists for this user and article. Document ID: " + documentId);
+                    }
+                }
+        );
+
+
     }
-    private void onClicks(PostFeedActionsClass actions, NewsModel newsItem, NewsViewHolder holder, int position){
+
+    private void onClicks(PostFeedActionsClass actions, NewsModel newsItem, NewsViewHolder holder, int position) {
         holder.newsHeadline.setOnClickListener(v -> {
             String url = newsItem.getUrl();
             actions.goToWebView(url);
@@ -84,14 +140,20 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
             // a func that accepts the newsItem all data. Then, it will process it to turn i
             // nto a map with added key "user_id" and to get it is to _Master.sharedPreferences.getString("session_user_id"
             //then it will call this _Master.addDataToCollection
-            Log.d(TAG, "onClicks: bookmark icon clicked "+newsItem.getDocument_id());
-            actions.storeBookmarkInFirestore(newsItem);
+            Log.d(TAG, "onClicks: bookmark icon clicked " + newsItem.getDocument_id());
+            actions.storeUserReactionThingInFirestore("bookmark", newsItem, "Reactions", holder.bookmarkIcon, R.drawable.icon_bookmark_marked,R.drawable.icon_bookmark_unmarked);
+        });
+        holder.upvoteIcon.setOnClickListener(v -> {
+            Log.d(TAG, "onClicks: upvote icon clicked " + newsItem.getDocument_id());
+            actions.storeUserReactionThingInFirestore("upvote", newsItem, "Reactions", holder.upvoteIcon, R.drawable.icon_upvote_yellow, R.drawable.icon_upvote);
+        });
+        holder.downvoteIcon.setOnClickListener(v -> {
+            Log.d(TAG, "onClicks: downcote icon clicked " + newsItem.getDocument_id());
+            actions.storeUserReactionThingInFirestore("downvote", newsItem, "Reactions", holder.downvoteIcon, R.drawable.icon_downvote_yellow, R.drawable.icon_downvote);
         });
 
 
-
     }
-
 
 
     @Override
@@ -102,7 +164,8 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
     public static class NewsViewHolder extends RecyclerView.ViewHolder {
         TextView newsSource, newsDate, newsHeadline, newsBody;
         TextView upvoteCount, downvoteCount, commentsCount;
-        ImageView newsImage, iconSearch, bookmarkIcon, linkCopyIcon;
+        ImageView newsImage, iconSearch, bookmarkIcon, linkCopyIcon, upvoteIcon, downvoteIcon;
+        ConstraintLayout commentsContainerButton;
 
         public NewsViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -117,6 +180,9 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
             commentsCount = itemView.findViewById(R.id.commentsCount);
             bookmarkIcon = itemView.findViewById(R.id.icon_bookmark);
             linkCopyIcon = itemView.findViewById(R.id.icon_link);
+            upvoteIcon = itemView.findViewById(R.id.icon_upvote);
+            downvoteIcon = itemView.findViewById(R.id.icon_downvote);
+            commentsContainerButton = itemView.findViewById(R.id.commentsContainer);
         }
     }
 }

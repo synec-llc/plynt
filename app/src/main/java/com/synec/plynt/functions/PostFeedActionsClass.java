@@ -4,6 +4,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.synec.plynt.WebViewActivity;
@@ -26,15 +27,11 @@ public class PostFeedActionsClass extends NewsAdapter {
     private static String TAG = "PostFeedActionsClass";
 
 
-
-
-
-
     // Method to open WebViewActivity when the news headline is clicked
     public void goToWebView(String url) {
         if (url != null && !url.isEmpty()) {
             WebViewActivity.start(context, url); // Using the getter for context
-            Log.d(TAG, "setupClickListener: "+url);
+            Log.d(TAG, "setupClickListener: " + url);
         }
     }
 
@@ -52,41 +49,71 @@ public class PostFeedActionsClass extends NewsAdapter {
         }
     }
 
-    public void storeBookmarkInFirestore(NewsModel newsItem) {
+    public void storeUserReactionThingInFirestore(String action,
+                                                  NewsModel newsItem,
+                                                  String collectionName,
+                                                  ImageView imageIcon,
+                                                  int markedImageIconResource,
+                                                  int unmarkedImageIconResource) {
         // Retrieve the user ID from SharedPreferences
         String userId = _Master.sharedPreferences.getString("session_user_id", null);
 
         if (userId != null) {
             // Check if the document already exists
-            if (!_Master.isDocumentExistsAccordingToTwoParameters("Bookmarks" , "Bookmarks","user_document_id", userId, newsItem.getArticle_id())) {
-                // If document does not exist, prepare the data for storing
-                Map<String, Object> bookmarkData = new HashMap<>();
-                bookmarkData.put("user_document_id", userId);
-                bookmarkData.put("article_id", newsItem.getArticle_id());
-                bookmarkData.put("bookmark_date", _Master.getCurrentFormattedDateTime()); // Assuming you have a method for this
+            Map<String, Object> dataMap = new HashMap<>();
+            dataMap.put("user_document_id", userId);
+            dataMap.put("article_id", newsItem.getArticle_id());
+            dataMap.put("creation_date", _Master.getCurrentFormattedDateTime());
 
-                // Call the function to add the data to the Firestore collection
-                _Master.addDataToCollection("Bookmarks", bookmarkData,
-                        documentReference -> {
-                            // Handle success
-                            Toast.makeText(context, "Bookmark added successfully!", Toast.LENGTH_SHORT).show();
-                            Log.d(TAG, "storeBookmarkInFirestore: Bookmark added successfully! " + documentReference.getId());
-                        },
-                        e -> {
-                            // Handle failure
-                            Toast.makeText(context, "Failed to add bookmark: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        });
-            } else {
-                // Log and inform user that bookmark already exists
-                Log.d(TAG, "storeBookmarkInFirestore: Bookmark already exists for this user and article.");
-                Toast.makeText(context, "This article is already bookmarked!", Toast.LENGTH_SHORT).show();
-            }
+            _Master.isDocumentExistsAccordingToTwoParameters(
+                    collectionName,
+                    "user_document_id",
+                    "article_id",
+                    userId,
+                    newsItem.getArticle_id(),
+                    imageIcon,
+                    markedImageIconResource,
+                    documentId -> {
+                        if (documentId == null) {
+                            // If the document does not exist, prepare the data for storing
+                            dataMap.put("action", "add ".concat(action));
+
+                            _Master.addDataToCollection(collectionName, dataMap, // Call the function to add the data to the Firestore collection
+                                    documentReference -> {
+                                        // Handle success
+                                        Log.d(TAG, "storeReactionsInFirestore: Thing added successfully! " + documentReference.getId());
+                                        imageIcon.setImageResource(markedImageIconResource);
+                                    },
+                                    e -> {
+                                        Toast.makeText(context, "Failed to add Thing: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    });
+                        } else {
+                            // Log and inform user that bookmark already exists
+                            Log.d(TAG, "storeReactionsInFirestore: Thing already exists for this user and article. Document ID: " + documentId);
+                            dataMap.put("action", "remove ".concat(action));
+
+                            // Call the function to delete the document by ID
+                            _Master.deleteDocumentById(collectionName, documentId, context, imageIcon, unmarkedImageIconResource);
+                        }
+
+                        // Save to archive the reactions
+                        _Master.addDataToCollection("ReactionsArchive", dataMap, // Call the function to add the data to the Firestore collection
+                                documentReference -> {
+                                    // Handle success
+                                    Log.d(TAG, "storeReactionsInFirestore: Thing added successfully to ReactionsArchive! " + documentReference.getId());
+                                },
+                                e -> {
+                                    Toast.makeText(context, "Failed to add Thing to ReactionsArchive: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                });
+                    }
+            );
+
+
         } else {
             // Handle case where user ID is null
             Toast.makeText(context, "User ID not found!", Toast.LENGTH_SHORT).show();
         }
     }
-
 
 
 }

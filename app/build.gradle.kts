@@ -37,33 +37,46 @@ android {
     }
 }
 
+
 dependencies {
-    implementation(libs.google.auth)  // Add this line for Google Play Services Auth
+    // Google Play Services and Firebase
+    implementation("com.google.android.gms:play-services-auth:20.5.0")
+    implementation("com.google.firebase:firebase-analytics:20.0.0")
+    implementation("com.google.firebase:firebase-firestore:24.0.0")
+    implementation("com.google.firebase:firebase-auth:21.0.0")
+    implementation("com.google.firebase:firebase-storage:20.0.0")
 
-    // Other dependencies...
-    implementation(libs.appcompat)
-    implementation(libs.material)
-    implementation(libs.constraintlayout)
-    implementation(libs.lifecycle.livedata.ktx)
-    implementation(libs.lifecycle.viewmodel.ktx)
-    implementation(libs.navigation.fragment)
-    implementation(libs.navigation.ui)
-    implementation(libs.activity)
-    implementation(libs.firebase.analytics)
-    implementation(libs.firebase.firestore)
-    implementation(libs.firebase.auth)
-    implementation(libs.firebase.storage)
-    implementation(libs.legacy.support.v4)
+    // Android Support Libraries
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("com.google.android.material:material:1.5.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.4.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.3.5")
+    implementation("androidx.navigation:navigation-ui-ktx:2.3.5")
+    implementation("androidx.activity:activity-ktx:1.4.0")
+    implementation("androidx.legacy:legacy-support-v4:1.0.0")
 
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.ext.junit)
-    androidTestImplementation(libs.espresso.core)
+    // Networking Libraries
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:okhttp-dnsoverhttps:4.9.1")
+    implementation("com.android.volley:volley:1.2.1")
 
-    // Corrected Glide dependencies with parentheses
+    // Image Loading Library
     implementation("com.github.bumptech.glide:glide:4.12.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
-    implementation ("com.google.code.gson:gson:2.8.8")
 
-    implementation("com.google.android.gms:play-services-auth:20.5.0")
+    // JSON Parsing
+    implementation("com.google.code.gson:gson:2.8.8")
 
+    // Cronet for network performance
+//    implementation("org.chromium.net:cronet-embedded:88.0.4324.0")
+
+    // Testing Libraries
+    testImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }
+
+
