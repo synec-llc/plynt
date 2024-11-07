@@ -28,12 +28,20 @@ public class PostFeedActionsClass extends NewsAdapter {
 
 
     // Method to open WebViewActivity when the news headline is clicked
-    public void goToWebView(String url) {
+//    public void goToWebView(String url) {
+//        if (url != null && !url.isEmpty()) {
+//            WebViewActivity.start(context, url); // Using the getter for context
+//            Log.d(TAG, "setupClickListener: " + url);
+//        }
+//    }
+    public void goToWebView(String url, String newsTitle, String newsPublisher, String newsDate,
+                            String newsAuthor, String newsCategory, String newsDescription, String newsKeywords) {
         if (url != null && !url.isEmpty()) {
-            WebViewActivity.start(context, url); // Using the getter for context
+            WebViewActivity.start(context, url, newsTitle, newsPublisher, newsDate, newsAuthor, newsCategory, newsDescription, newsKeywords);
             Log.d(TAG, "setupClickListener: " + url);
         }
     }
+
 
     public void putURLToClipboard(String url) {
         if (url != null && !url.isEmpty()) {

@@ -24,11 +24,17 @@ public class GPTCallClass {
 
     private Context context;
 
+    // Callback interface
+    public interface GPTResponseCallback {
+        void onResponseReceived(String response);
+        void onErrorReceived(String error);
+    }
+
     public GPTCallClass(Context context) {
         this.context = context;
     }
 
-    public void sendRequest(String prompt) {
+    public void sendRequest(String prompt, final GPTResponseCallback callback) {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("model", "gpt-3.5-turbo-instruct");
@@ -38,8 +44,9 @@ public class GPTCallClass {
 
         } catch (JSONException e) {
             Log.e(TAG, "JSON error: " + e.getMessage());
+            callback.onErrorReceived("JSON error: " + e.getMessage());
+            return; // Exit the method if JSON setup fails
         }
-        Log.d(TAG, "sendRequest: "+jsonObject.toString());
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
                 ENDPOINT_URL, jsonObject, new Response.Listener<JSONObject>() {
@@ -49,15 +56,19 @@ public class GPTCallClass {
                     String output = response.getJSONArray("choices")
                             .getJSONObject(0)
                             .getString("text");
-                    Log.d(TAG, "Response: " + output);
+//                    Log.d(TAG, "GPT Response: " + output);
+                    Log.d(TAG, "GPT Response Successful");
+                    callback.onResponseReceived(output); // Pass the output to callback
                 } catch (JSONException e) {
                     Log.e(TAG, "JSON parsing error: " + e.getMessage());
+                    callback.onErrorReceived("JSON parsing error: " + e.getMessage());
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e(TAG, "Volley error: " + error.getMessage());
+                callback.onErrorReceived("Volley error: " + error.getMessage());
             }
         }) {
             @Override
@@ -68,7 +79,6 @@ public class GPTCallClass {
                 return headers;
             }
         };
-
 
         jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
                 60000, // 60 seconds timeout

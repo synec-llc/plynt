@@ -128,9 +128,23 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
     }
 
     private void onClicks(PostFeedActionsClass actions, NewsModel newsItem, NewsViewHolder holder, int position) {
+        // Assuming keywords is a List<String> or String[]
+        String[] keywords = newsItem.getKeywords().toArray(new String[0]);
+        String keywordsString = String.join(", ", keywords); // Joins with commas
+
         holder.newsHeadline.setOnClickListener(v -> {
             String url = newsItem.getUrl();
-            actions.goToWebView(url);
+            actions.goToWebView(
+                    url,
+                    newsItem.getTitle(),
+                    newsItem.getPublisher(),
+                    newsItem.getPublishing_date(),
+                    newsItem.getAuthor(),
+                    newsItem.getCategory().get(0),
+                    newsItem.getDescription(),
+                    keywordsString
+            );
+
         });
         holder.linkCopyIcon.setOnClickListener(v -> {
             String url = newsItem.getUrl();

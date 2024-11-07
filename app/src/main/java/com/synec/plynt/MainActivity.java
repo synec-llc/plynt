@@ -13,7 +13,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.synec.plynt.databinding.ActivityMainBinding;
-import com.synec.plynt.functions.GPTCallClass;
+import com.synec.plynt.functions.EdenAIWorkflowRunner;
 import com.synec.plynt.helpers.PermissionsHelper;
 
 public class MainActivity extends AppCompatActivity {
@@ -81,13 +81,29 @@ private TextView textView;
         textView = findViewById(R.id.textView);
         String inputText = "Hello, Llama!";
 
-//        GeminiAPICall geminiAPI = new GeminiAPICall();
-//        geminiAPI.sendRequest("write a poem");
+        // Calling the GPT Class
+//        GPTCallClass gptCall = new GPTCallClass(this);
+//        String prompt = "Explain the concept of machine learning.";
+//        gptCall.sendRequest(prompt, new GPTCallClass.GPTResponseCallback() {
+//            @Override
+//            public void onResponseReceived(String response) {
+//                Log.d(TAG, "GPT Response: " + response);
+//                Toast.makeText(MainActivity.this, "Response: " + response, Toast.LENGTH_LONG).show();
+//            }
+//            @Override
+//            public void onErrorReceived(String error) {
+//                Log.e(TAG, "Error: " + error);
+//                Toast.makeText(MainActivity.this, "Error: " + error, Toast.LENGTH_LONG).show();
+//            }
+//        });
 
-        GPTCallClass gptCall = new GPTCallClass(MainActivity.this);
-        gptCall.sendRequest("Write a 100 word poem about clouds");
+        EdenAIWorkflowRunner ttsProcessor = new EdenAIWorkflowRunner(getApplicationContext());
+        String text = "You will never learn your lesson";
+        String language = "en";
+        ttsProcessor.runWorkflow(text, language);
 
     }
+
     
 
     @Override
