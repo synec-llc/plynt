@@ -50,6 +50,10 @@ public class AggregateNewsByTopic {
         if (task.isSuccessful()) {
             Log.d(TAG, "Handling query results for topic: " + topic);
             for (QueryDocumentSnapshot document : task.getResult()) {
+                if (newsItems.size() >= 2) {
+                    break;
+                }
+
                 String documentId = document.getId();
                 if (!matchedDocumentIds.contains(documentId)) {
                     try {
