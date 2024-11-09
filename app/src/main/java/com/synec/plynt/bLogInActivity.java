@@ -75,6 +75,11 @@ public class bLogInActivity extends AppCompatActivity {
         googleLoginImageView = findViewById(R.id.googleLoginImageView);
         facebookLoginImageView = findViewById(R.id.facebookLoginImageView);
 
+        if (_Master.isSessionExistingAlready(bLogInActivity.this)){
+            Log.d(TAG, "A session already exists: Redirecting to Main Activity now." );
+            Intent i = new Intent(this, MainActivity.class);
+            startActivity(i);
+        }
         // Handle login button click
         logInButton.setOnClickListener(v -> {
             String email = emailEditText.getText().toString().trim();

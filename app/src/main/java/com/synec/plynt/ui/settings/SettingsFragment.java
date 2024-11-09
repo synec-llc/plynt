@@ -50,6 +50,10 @@ public class SettingsFragment extends Fragment {
                 .setMessage("Are you sure you want to log out?")
                 .setPositiveButton("Yes", (dialog, which) -> {
                     // User clicked "Yes" - clear session data and redirect
+                    SharedPreferences preferences = requireActivity().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.clear();  // This will clear all data in PREF_NAME preferences
+                    editor.apply();  // Commit the changes asynchronously
                     clearSessionData();
                     redirectToLogin();
                 })

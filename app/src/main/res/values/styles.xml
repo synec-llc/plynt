@@ -86,6 +86,16 @@
         <item name="android:textSize">@dimen/body_text</item>
         <item name="android:textStyle">bold</item>
     </style>
+    <style name="PlyntButtonStyleNoBG" parent="Widget.AppCompat.Button">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/margin_large</item>
+        <item name="android:fontFamily">@font/raleway_regular</item>
+        <item name="android:padding">@dimen/margin_extra_small</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">@dimen/body_text</item>
+        <item name="android:textStyle">bold</item>
+    </style>
     <style name="PlyntYellowButtonStyle" parent="Widget.AppCompat.Button">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>

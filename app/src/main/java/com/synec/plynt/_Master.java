@@ -8,18 +8,25 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.gson.Gson;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -28,6 +35,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+
 
 public class _Master {
     // Define the SimpleDateFormat with milliseconds included
@@ -94,6 +102,42 @@ public class _Master {
                     Toast.makeText(context, "Failed to delete document: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
+
+    public static void downloadAndSaveCollectionToPreferences(String collectionPath) {
+        CollectionReference collectionRef = db.collection(collectionPath);
+
+        collectionRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(Task<QuerySnapshot> task) {
+                if (task.isSuccessful() && task.getResult() != null) {
+                    JSONObject jsonObject = new JSONObject();
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        try {
+                            jsonObject.put(document.getId(), new JSONObject(document.getData()));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString(collectionPath, jsonObject.toString());
+                    editor.apply();
+                } else {
+                    // Handle the error
+                    if (task.getException() != null) {
+                        task.getException().printStackTrace();
+                    }
+                }
+                String savedData = sharedPreferences.getString(collectionPath, null);
+                System.out.println("Saved Data News Collection: " + savedData);
+
+            }
+
+        });
+    }
+
+
+
 
 
     public interface OnDocumentExistsCallback {
@@ -558,7 +602,6 @@ public class _Master {
                             for (Map.Entry<String, Object> entry : sessionData.entrySet()) {
                                 Log.d("SessionData", entry.getKey() + ": " + entry.getValue());
                             }
-
                             // Redirect to bPrivacyPolicyActivity
                             Log.d("LogIn", "Successfully logged in: " + document.getString("full_name"));
                             Intent intent;
@@ -608,6 +651,40 @@ public class _Master {
         // Apply changes to SharedPreferences
         editor.apply();
     }
+    public static boolean isSessionExistingAlready(Context context) {
+        // Access SharedPreferences
+        SharedPreferences preferences = context.getSharedPreferences(PREF_NAME, PREF_MODE);
+
+        // Fields to check
+        String[] requiredFields = {
+                "session_user_id",
+                "session_user_document_id",
+                "session_full_name",
+                "session_first_name",
+                "session_last_name",
+                "session_email",
+                "session_agreed_to_privacy_policy_date"
+        };
+
+        for (String field : requiredFields) {
+            // Retrieve the value from SharedPreferences
+            String value = preferences.getString(field, null);
+
+            // Check if the field is null or empty
+            if (value == null || value.isEmpty()) {
+                // Log which field is missing or empty
+                Log.d("SessionValidation", field + " is missing or empty.");
+                return false;
+            } else {
+                // Log the valid field content
+                Log.d("SessionValidation", field + ": " + value);
+            }
+        }
+
+        // All required fields have content
+        return true;
+    }
+
 
     // Function to generate a unique 30-character session ID
     public static String generateSessionID(int length) {
@@ -679,4 +756,6 @@ public class _Master {
     }
 
 
-}
+
+    }
+

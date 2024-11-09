@@ -13,7 +13,6 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.synec.plynt.databinding.ActivityMainBinding;
-import com.synec.plynt.functions.EdenAIWorkflowRunner;
 import com.synec.plynt.helpers.PermissionsHelper;
 
 public class MainActivity extends AppCompatActivity {
@@ -40,6 +39,8 @@ private TextView textView;
         // Call the PermissionsHelper to check and request permissions
         PermissionsHelper.checkAndRequestPermissions(this);
         _Master.showAllSharedPreferences(MainActivity.this, TAG);
+
+//        _Master.downloadAndSaveCollectionToPreferences("NewsData");
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
@@ -97,10 +98,10 @@ private TextView textView;
 //            }
 //        });
 
-        EdenAIWorkflowRunner ttsProcessor = new EdenAIWorkflowRunner(getApplicationContext());
-        String text = "You will never learn your lesson";
-        String language = "en";
-        ttsProcessor.runWorkflow(text, language);
+//        EdenAIWorkflowRunner ttsProcessor = new EdenAIWorkflowRunner(getApplicationContext());
+//        String text = "You will never learn your lesson";
+//        String language = "en";
+//        ttsProcessor.runWorkflow(text, language);
 
     }
 

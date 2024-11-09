@@ -27,6 +27,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class bSignUpActivity extends AppCompatActivity {
 
@@ -179,7 +180,7 @@ public class bSignUpActivity extends AppCompatActivity {
 
     private void saveUserToFirestore(FirebaseUser user) {
         if (user != null) {
-            String formattedDate = _Master.sdf.format(new Date(user.getMetadata().getCreationTimestamp()));
+            String formattedDate = _Master.sdf.format(new Date(Objects.requireNonNull(user.getMetadata()).getCreationTimestamp()));
 
             // Create a user object with name, email, and photo URL
             Map<String, Object> userMap = new HashMap<>();
@@ -198,6 +199,7 @@ public class bSignUpActivity extends AppCompatActivity {
             userMap.put("birthday", null);
             userMap.put("age", null);
             userMap.put("agreed_to_privacy_policy_date", null);
+
 
             _Master.db.collection("UserData").document(user.getUid())
                     .set(userMap)

@@ -32,7 +32,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/widgetContainer"
+                android:id="@+id/sendFeedbackContainer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="@dimen/margin_small"
@@ -67,7 +67,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginRight="@dimen/margin_small"
                 android:layout_marginTop="@dimen/margin_small"
-                app:layout_constraintEnd_toStartOf="@+id/widgetContainer"
+                app:layout_constraintEnd_toStartOf="@+id/sendFeedbackContainer"
                 app:layout_constraintTop_toTopOf="parent">
 
 
@@ -84,7 +84,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="3dp"
-                    android:text="Good Morning"
+                    android:text="Daily Plynt"
                     app:layout_constraintBottom_toBottomOf="@+id/icon_good_morning"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.5"
@@ -111,15 +111,17 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintWidth_percent="0.9">
 
-                    <com.google.android.material.textfield.TextInputEditText
+                    <AutoCompleteTextView
                         android:id="@+id/searchInput"
                         style="@style/UserCredentialInputText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:textSize="@dimen/body_text"
                         android:hint="@string/search_for_topics_to_add"
-                        android:inputType="textEmailAddress" />
+                        android:inputType="text" />
 
                 </com.google.android.material.textfield.TextInputLayout>
+
 
                 <ImageView
                     android:id="@+id/icon_plus"

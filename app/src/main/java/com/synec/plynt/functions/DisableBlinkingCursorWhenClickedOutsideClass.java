@@ -2,14 +2,14 @@ package com.synec.plynt.functions;
 
 import android.view.MotionEvent;
 import android.view.View;
-import androidx.appcompat.widget.AppCompatEditText;
+import android.widget.AutoCompleteTextView;
 
 public class DisableBlinkingCursorWhenClickedOutsideClass {
 
-    private AppCompatEditText textInputEditText;
+    private AutoCompleteTextView textInputEditText;
     private View parentLayout;
 
-    public DisableBlinkingCursorWhenClickedOutsideClass(AppCompatEditText textInputEditText, View parentLayout) {
+    public DisableBlinkingCursorWhenClickedOutsideClass(AutoCompleteTextView textInputEditText, View parentLayout) {
         this.textInputEditText = textInputEditText;
         this.parentLayout = parentLayout;
 

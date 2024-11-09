@@ -1,5 +1,6 @@
 package com.synec.plynt.ui.account;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,12 +12,14 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
+import com.synec.plynt.FeedbackWebViewActivity;
 import com.synec.plynt.R;
 import com.synec.plynt._Master;
 
@@ -39,8 +42,9 @@ public class AccountFragment extends Fragment {
     private TextView informedRateLabel;
     private ImageView bookmarkIcon;
     private TextView bookmarksText;
+    private ConstraintLayout sendFeedbackContainer;
+
     View root;
-    // Add other views as needed...
 
     public static AccountFragment newInstance() {
         return new AccountFragment();
@@ -74,6 +78,8 @@ public class AccountFragment extends Fragment {
         informedRateLabel = rootView.findViewById(R.id.informedRateLabel);
         bookmarkIcon = rootView.findViewById(R.id.bookmarkIcon);
         bookmarksText = rootView.findViewById(R.id.bookmarksText);
+        sendFeedbackContainer = rootView.findViewById(R.id.sendFeedbackContainer);
+
 
         //put them in the views
         String imageUrl = _Master.sharedPreferences.getString("session_image_url", "");
@@ -92,7 +98,7 @@ public class AccountFragment extends Fragment {
 
         // Assign values to the views
         userName.setText(fullName);
-        userEmail.setText(email);
+        userEmail.setText(email +" (Sorry, not working too yet)");
         totalArticles.setText(articlesCount.toString());
         maxReadingStreak.setText(readingStreak.toString());
         informedRate.setText(informedRating.toString() + "%");
@@ -102,6 +108,18 @@ public class AccountFragment extends Fragment {
     }
 
     private void onClicks(){
+        // Set a click listener to open the feedback form or perform an action
+        sendFeedbackContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String feedbackUrl = "https://docs.google.com/forms/d/e/1FAIpQLSeh8VVXdAcsu8AbYJ6GahZWyEhqi87fXg790xYKsoPvnJDMYg/viewform?usp=sf_link"; // replace with your actual Google Form link
+
+                // Example: if using WebView in another activity
+                Intent intent = new Intent(getContext(), FeedbackWebViewActivity.class);
+                intent.putExtra("url", feedbackUrl);
+                startActivity(intent);
+            }
+        });
         profileImage.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {

@@ -51,7 +51,7 @@
         <TextView
             android:id="@+id/titleSplashPlyntIntroduction"
             style="@style/SplashTextTitleStyle"
-            android:text="@string/introducing_plynt"
+            android:text="SETTING UP EXPECTATIONS"
             android:layout_marginTop="@dimen/dimension_0_dp"
             app:layout_constraintEnd_toEndOf="@id/guidelineRight"
             app:layout_constraintHorizontal_bias="0.0"
@@ -59,15 +59,28 @@
             app:layout_constraintTop_toTopOf="@+id/guidelineTop" />
 
         <!-- VideoView -->
+        <TextView
+            android:id="@+id/heytherepleasewatch"
+            style="@style/BodyText"
+            android:text="Thank you for joining Plynt in this phase. Please watch the intro vid (3 mins)."
+            android:textAlignment="center"
+            android:textSize="@dimen/body_text"
+            android:layout_width="match_parent"
+            android:textColor="@color/white"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="@id/guidelineRight"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@id/guidelineLeft"
+            app:layout_constraintTop_toBottomOf="@+id/titleSplashPlyntIntroduction" />
+
         <VideoView
             android:id="@+id/videoViewSplash"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="@dimen/margin_medium"
             app:layout_constraintEnd_toStartOf="@+id/guidelineRight"
             app:layout_constraintStart_toStartOf="@+id/guidelineLeft"
-            app:layout_constraintTop_toBottomOf="@+id/titleSplashPlyntIntroduction" />
+            app:layout_constraintTop_toBottomOf="@+id/heytherepleasewatch" />
 
         <!-- Introduction Message Text -->
         <TextView
@@ -92,6 +105,18 @@
             app:layout_constraintBottom_toBottomOf="@+id/textSplashPlyntIntroductionMessage"
             app:layout_constraintEnd_toEndOf="parent"
             tools:ignore="HardcodedText" />
+
+
+        <Button
+            android:id="@+id/getPitchDeckBtn"
+            style="@style/PlyntButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Get Pitch Deck"
+            android:fontFamily="@font/raleway_bold"
+            app:layout_constraintBottom_toTopOf="@+id/guidelineBottom"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

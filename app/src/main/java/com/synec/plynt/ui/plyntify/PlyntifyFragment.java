@@ -2,7 +2,6 @@ package com.synec.plynt.ui.plyntify;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -11,7 +10,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,29 +23,31 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.synec.plynt.R;
 import com.synec.plynt._Master;
 import com.synec.plynt.adapters.OrderOfTopicsAdapter;
 import com.synec.plynt.functions.DisableBlinkingCursorWhenClickedOutsideClass;
 import com.synec.plynt.functions.ManageOrderOfTopicsTouchHelperClass;
+import com.synec.plynt.functions.ProcessingPlyntifyClass;
+import com.synec.plynt.helpers.MediaPlayerSingleton;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class PlyntifyFragment extends Fragment implements ManageOrderOfTopicsTouchHelperClass.OnOrderChangedListener {
 
-    private String TAG = "PlyntifyFragment";
-    private PlyntifyViewModel mViewModel;
+    private static final int MAX_SUGGESTIONS = 4;
+    private static final String TAG = "PlyntifyFragment";
     private RecyclerView recyclerView;
     private OrderOfTopicsAdapter adapter;
     private List<String> topicList;
     private Context context;
-    private MediaPlayer mediaPlayer;
     private Button plyntifyButton;
     private ConstraintLayout parentLayout;
     SharedPreferences preferences;
-    TextInputEditText searchInput;
+    AutoCompleteTextView searchInput;
 
     public static PlyntifyFragment newInstance() {
         return new PlyntifyFragment();
@@ -61,24 +65,24 @@ public class PlyntifyFragment extends Fragment implements ManageOrderOfTopicsTou
         context = getContext();
         preferences = requireActivity().getSharedPreferences(_Master.PREF_NAME, Context.MODE_PRIVATE);
         searchInput = root.findViewById(R.id.searchInput);
+
         topicList = new ArrayList<>();
         new DisableBlinkingCursorWhenClickedOutsideClass(searchInput, parentLayout);
-        fillOrderOfTopicList();
+        fillOrderOfTopicList("");
 
-
-        // MediaPlayer and button setup (same as before)
-        boolean isPlaying = preferences.getBoolean(_Master.PREF_PLAYBACK_STATE, false);
-        int savedPosition = preferences.getInt("currentAudioPosition", 0);
-        if (isPlaying) {
-            initializeMediaPlayer();
-            mediaPlayer.seekTo(savedPosition);
-            mediaPlayer.start();
+        // Update button text based on playback state
+        if (MediaPlayerSingleton.isPlaying()) {
             plyntifyButton.setText("Pause");
         } else {
             plyntifyButton.setText("Play Plyntify");
         }
-        plyntifyButton.setOnClickListener(v -> togglePlayPause());
 
+        // Toggle playback on button click
+//        plyntifyButton.setOnClickListener(v -> togglePlayPause()); //old
+        plyntifyButton.setOnClickListener(v -> processTopics());
+
+        // Setup autocomplete for searchInput
+        setupAutoComplete();
 
         searchInput.setOnEditorActionListener((v, actionId, event) -> {
             // Check if the enter key is pressed
@@ -94,14 +98,13 @@ public class PlyntifyFragment extends Fragment implements ManageOrderOfTopicsTou
                             aVoid -> addNewTopicInTheFragmentRecyclerView(inputText));
                     searchInput.setText("");
 
-
                     // Hide the keyboard
                     InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
                     if (imm != null) {
                         imm.hideSoftInputFromWindow(searchInput.getWindowToken(), 0);
                     }
                 }
-                return true;  // Indicate that the event was handled
+                return true;
             }
             return false;
         });
@@ -109,20 +112,85 @@ public class PlyntifyFragment extends Fragment implements ManageOrderOfTopicsTou
         return root;
     }
 
+    //plyntify processing
+    private void processTopics() {
+        Toast.makeText(context, "Preparing Plyntify... please wait", Toast.LENGTH_SHORT).show();
+        String[] topicsArray = topicList.toArray(new String[0]);
+        int totalLength = 0;
+        for (String topic : topicsArray) {
+            totalLength += topic.length();
+        }
+        Log.d(TAG, "to PlyntifyprocessTopics: " + topicsArray.toString());
+        new ProcessingPlyntifyClass(context, plyntifyButton, topicsArray, totalLength);
+    }
 
-    public void fillOrderOfTopicList() {
-        Log.d(TAG, "session doc id: " + preferences.getString("session_user_id", ""));
-        _Master.getOrderOfTopics(preferences.getString("session_user_id", ""), context, orderOfTopics -> {
-            for (String topic : orderOfTopics) {
-                Log.d("PlyntifyFragment", "Topic: " + topic);
-                topicList.add(topic);
+
+    private void setupAutoComplete() {
+        searchInput.addTextChangedListener(new android.text.TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // No action needed here
             }
 
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String queryText = s.toString().toLowerCase();
+                fetchTopicsForAutocomplete(queryText);
+            }
+
+            @Override
+            public void afterTextChanged(android.text.Editable s) {
+                // No action needed here
+            }
+        });
+    }
+    private void fetchTopicsForAutocomplete(String queryText) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("Topics")
+                .whereGreaterThanOrEqualTo("name", queryText)
+                .whereLessThanOrEqualTo("name", queryText + "\uf8ff") // "Starts with" filtering
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        List<String> suggestions = new ArrayList<>();
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            String name = document.getString("name");
+                            if (name != null) {
+                                suggestions.add(name);
+                            }
+                            // Stop adding to suggestions once we've reached the max limit
+                            if (suggestions.size() >= MAX_SUGGESTIONS) {
+                                break;
+                            }
+                        }
+                        updateAutoCompleteSuggestions(suggestions);
+                    } else {
+                        Log.e(TAG, "Error fetching topics for autocomplete", task.getException());
+                    }
+                });
+    }
+
+    private void updateAutoCompleteSuggestions(List<String> suggestions) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(context, android.R.layout.simple_dropdown_item_1line, suggestions);
+        searchInput.setAdapter(adapter);
+        searchInput.showDropDown();
+    }
+
+    public void fillOrderOfTopicList(String searchText) {
+        Log.d(TAG, "session doc id: " + preferences.getString("session_user_id", ""));
+        _Master.getOrderOfTopics(preferences.getString("session_user_id", ""), context, orderOfTopics -> {
+            topicList.clear();
+            for (String topic : orderOfTopics) {
+                if (topic.toLowerCase().startsWith(searchText.toLowerCase())) {
+                    topicList.add(topic);
+                }
+            }
             setTopicsToTheRecyclerView(topicList);
         });
     }
+
     public void addNewTopicInTheFragmentRecyclerView(String newTopic) {
-        if (!topicList.contains(newTopic)) { // Check if the topic is already in the list
+        if (!topicList.contains(newTopic)) {
             Log.d(TAG, "Topic added successfully in Firestore");
             topicList.add(newTopic);
             setTopicsToTheRecyclerView(topicList);
@@ -131,22 +199,39 @@ public class PlyntifyFragment extends Fragment implements ManageOrderOfTopicsTou
         }
     }
 
-
-    private void setTopicsToTheRecyclerView(List<String> finalTopicList){
-        adapter = new OrderOfTopicsAdapter(finalTopicList);
+    private void setTopicsToTheRecyclerView(List<String> finalTopicList) {
+        // Convert each topic to title case
+        List<String> formattedTopicList = new ArrayList<>();
+        for (String topic : finalTopicList) {
+            formattedTopicList.add(convertToTitleCase(topic));
+        }
+        // Use the formatted list for the adapter
+        adapter = new OrderOfTopicsAdapter(formattedTopicList);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.setAdapter(adapter);
-
-        // Set up swipe and drag feature with custom ItemTouchHelper
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ManageOrderOfTopicsTouchHelperClass(adapter, topicList, context, this));
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ManageOrderOfTopicsTouchHelperClass(adapter, formattedTopicList, context, this));
         itemTouchHelper.attachToRecyclerView(recyclerView);
     }
+
+    // Helper function to convert a string to title case
+    private String convertToTitleCase(String input) {
+        String[] words = input.split(" ");
+        StringBuilder titleCase = new StringBuilder();
+        for (String word : words) {
+            if (word.length() > 0) {
+                titleCase.append(Character.toUpperCase(word.charAt(0)))
+                        .append(word.substring(1).toLowerCase())
+                        .append(" ");
+            }
+        }
+        return titleCase.toString().trim(); // Remove the trailing space
+    }
+
 
     @Override
     public void onOrderChanged(List<String> newOrder) {
         Log.d(TAG, "Updated topic order: " + newOrder);
 
-        // Call updateOrderOfTopics and handle success or failure in the callback
         _Master.updateOrderOfTopics(
                 preferences.getString("session_user_id", ""),
                 context,
@@ -155,53 +240,19 @@ public class PlyntifyFragment extends Fragment implements ManageOrderOfTopicsTou
         );
     }
 
-
-    private void initializeMediaPlayer() {
-        if (mediaPlayer == null) {
-            mediaPlayer = MediaPlayer.create(context, R.raw.sample_audio_1);
-            mediaPlayer.setOnCompletionListener(mp -> {
-                plyntifyButton.setText("Play Plyntify");
-                savePlaybackState(false, 0);
-            });
-        }
-    }
-
-    private void togglePlayPause() {
-        if (mediaPlayer == null) {
-            initializeMediaPlayer();
-        }
-
-        if (mediaPlayer.isPlaying()) {
-            int position = mediaPlayer.getCurrentPosition();
-            mediaPlayer.pause();
-            plyntifyButton.setText("Continue Playing");
-            savePlaybackState(false, position);
+    public void togglePlayPause() {
+        if (MediaPlayerSingleton.isPlaying()) {
+            MediaPlayerSingleton.pause(context);
+            plyntifyButton.setText("Play Plyntify");
         } else {
-            mediaPlayer.start();
+            MediaPlayerSingleton.play(context);
             plyntifyButton.setText("Pause");
-            savePlaybackState(true, mediaPlayer.getCurrentPosition());
-        }
-    }
-
-    private void savePlaybackState(boolean isPlaying, int position) {
-        SharedPreferences preferences = requireActivity().getSharedPreferences(_Master.PREF_NAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean(_Master.PREF_PLAYBACK_STATE, isPlaying);
-        editor.putInt("currentAudioPosition", position);
-        editor.apply();
-    }
-
-    private void releaseMediaPlayer() {
-        if (mediaPlayer != null) {
-            mediaPlayer.release();
-            mediaPlayer = null;
-            savePlaybackState(false, 0);
         }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        releaseMediaPlayer();
+        MediaPlayerSingleton.release();
     }
 }
