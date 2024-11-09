@@ -2,6 +2,7 @@ package com.synec.plynt.functions;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
@@ -37,7 +38,9 @@ public class GPTCallClass {
     public void sendRequest(String prompt, final GPTResponseCallback callback) {
         JSONObject jsonObject = new JSONObject();
         try {
+            Log.d(TAG, "Final Prompt: "+prompt);
             jsonObject.put("model", "gpt-3.5-turbo-instruct");
+//            jsonObject.put("model", "text-davinci-003");
             jsonObject.put("prompt", prompt);
             jsonObject.put("max_tokens", 1000);
             jsonObject.put("temperature", 0);
@@ -67,9 +70,19 @@ public class GPTCallClass {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(TAG, "Volley error: " + error.getMessage());
-                callback.onErrorReceived("Volley error: " + error.getMessage());
+                String message = null;
+                if (error.networkResponse != null && error.networkResponse.data != null) {
+                    message = new String(error.networkResponse.data);
+                    Log.e(TAG, "Volley error: " + message);  // Log the detailed error message from the server
+                    Toast.makeText(context, "Max analysis token exceeded.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Please lessen the num of topics 😄", Toast.LENGTH_SHORT).show();
+                    callback.onErrorReceived("Volley error: " + message);
+                } else {
+                    Log.e(TAG, "Volley error: " + error.toString());
+                    callback.onErrorReceived("Volley error: " + error.toString());
+                }
             }
+
         }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {

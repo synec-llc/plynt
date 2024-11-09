@@ -1,5 +1,6 @@
 package com.synec.plynt.ui.plyntify;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -13,6 +14,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -46,6 +49,8 @@ public class PlyntifyFragment extends Fragment implements ManageOrderOfTopicsTou
     private Context context;
     private Button plyntifyButton;
     private ConstraintLayout parentLayout;
+    private ConstraintLayout dailyPlyntContainer, widgetContainer;
+    private ImageView hintContainer;
     SharedPreferences preferences;
     AutoCompleteTextView searchInput;
 
@@ -65,6 +70,10 @@ public class PlyntifyFragment extends Fragment implements ManageOrderOfTopicsTou
         context = getContext();
         preferences = requireActivity().getSharedPreferences(_Master.PREF_NAME, Context.MODE_PRIVATE);
         searchInput = root.findViewById(R.id.searchInput);
+        dailyPlyntContainer = root.findViewById(R.id.goodMorningContainer);
+        widgetContainer = root.findViewById(R.id.sendFeedbackContainer);
+        hintContainer = root.findViewById(R.id.plyntifyHint);
+
 
         topicList = new ArrayList<>();
         new DisableBlinkingCursorWhenClickedOutsideClass(searchInput, parentLayout);
@@ -108,6 +117,25 @@ public class PlyntifyFragment extends Fragment implements ManageOrderOfTopicsTou
             }
             return false;
         });
+
+        // Define click listeners in onCreateView() or a similar initialization method
+        dailyPlyntContainer.setOnClickListener(v -> showCustomDialog("Daily Plynt",
+                "Daily Plynt is the automatic playing of Plyntify at a specific time set by the user." +
+                        "So it can play when the user wakes up, eating, going to sleep, or when commuting to work. " +
+                        "This enables the app to fit seamlessly to the lifestyle of the user 😄 This is still not functional." +
+                        "\n\nBest,\nNephi"));
+
+        widgetContainer.setOnClickListener(v -> showCustomDialog("Widget Overview",
+                "This widget feature enables quick access to playing Plyntify without opening the app, making it easy " +
+                        "to keep up with the latest stories at a click. Not working." +
+                        "\n\nBest,\nNephi"));
+
+        hintContainer.setOnClickListener(v -> showCustomDialog("How Plyntify Works",
+                "Plyntify is the heart of Plynt.\n" +
+                        "This feature curates the top news based on topics you select, analyzing content from reliable sources to deliver concise, engaging summaries.\n\n" +
+                        "It uses AI to break down complex information and presents it in a conversational, friendly tone, like an informed friend keeping you updated.\n\n" +
+                        "Each summary is narrated in a radio-style format, allowing you to listen on the go, stay informed, and enjoy news that’s easy to understand.\n\n" +
+                        "With Plyntify, catching up on current events feels natural and engaging, helping you stay well-informed without needing to read through multiple articles."));
 
         return root;
     }
@@ -254,5 +282,35 @@ public class PlyntifyFragment extends Fragment implements ManageOrderOfTopicsTou
     public void onDestroy() {
         super.onDestroy();
         MediaPlayerSingleton.release();
+
+
     }
+
+    public void showCustomDialog(String titleText, String descriptionText) {
+        // Load the custom layout for the alert dialog
+        LayoutInflater inflater = getLayoutInflater();
+        View customView = inflater.inflate(R.layout.dialog_custom_alert, null);
+
+        // Initialize the alert dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setView(customView);
+        AlertDialog dialog = builder.create();
+
+        // Set title and description
+        TextView title = customView.findViewById(R.id.alertTitle);
+        title.setText(titleText);
+
+        TextView description = customView.findViewById(R.id.alertMessage);
+        description.setText(descriptionText);
+
+        // Set up the OK button
+        Button okButton = customView.findViewById(R.id.alertOkButton);
+        okButton.setOnClickListener(v -> dialog.dismiss());
+
+        // Display the dialog
+        dialog.show();
+    }
+
+
+
 }

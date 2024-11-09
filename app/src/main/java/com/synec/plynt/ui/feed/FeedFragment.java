@@ -22,6 +22,7 @@ import com.synec.plynt.adapters.NewsAdapter;
 import com.synec.plynt.models.NewsModel;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class FeedFragment extends Fragment {
@@ -62,6 +63,7 @@ public class FeedFragment extends Fragment {
     }
 
     // Method to fetch data from Firestore
+    // Method to fetch data from Firestore
     private void getNewsData() {
         FirebaseFirestore db = _Master.db;  // Use Master class's db instance
         Log.d(TAG, "Fetching news Data: ");
@@ -77,12 +79,17 @@ public class FeedFragment extends Fragment {
 
                         newsList.add(newsItem);
                     }
+
+                    // Randomize the list
+                    Collections.shuffle(newsList);
+
+                    // Notify adapter that data has changed
                     adapter.notifyDataSetChanged();
                 })
                 .addOnFailureListener(e -> {
                     Log.e("FeedFragment", "Error fetching data", e);
                     Toast.makeText(getContext(), "Error loading data", Toast.LENGTH_SHORT).show();
                 });
-
     }
+
 }

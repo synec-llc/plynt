@@ -48,7 +48,8 @@ public class EdenAIWorkflowRunner {
 
 
         // Segment the text if needed and add to the queue
-        if (text.length() <= 1500) {
+//        if (text.length() <= 1500) {
+        if (true) {
             textQueue.add(text);
             Log.d(TAG, "runWorkflow: Textlength is below 1500 char");
         } else {
@@ -105,7 +106,7 @@ public class EdenAIWorkflowRunner {
     // Method to process the next text segment in the queue
     private void processNextSegment() {
         if (!textQueue.isEmpty()) {
-            Toast.makeText(context, "Preparing audio playback...", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(context, "Preparing audio playback...", Toast.LENGTH_SHORT).show();
             String nextTextSegment = textQueue.poll();
             new StartWorkflowTask().execute(nextTextSegment, language);
         } else {
@@ -332,6 +333,9 @@ public class EdenAIWorkflowRunner {
     private void playAudio(File audioFile) {
         mediaPlayer = new MediaPlayer();
         try {
+//            PlyntifyFragment plynt = PlyntifyFragment.newInstance();
+//            plynt.togglePlayPause();
+
             mediaPlayer.setDataSource(audioFile.getAbsolutePath());
             mediaPlayer.prepare();
             mediaPlayer.start();

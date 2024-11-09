@@ -77,7 +77,7 @@ public class bSignUpActivity extends AppCompatActivity {
 
         // Set the click listener for Google sign-up
         signUpWithGoogle.setOnClickListener(view -> signInWithGoogle());
-
+        getSignUpWithFacebook.setOnClickListener(view -> _Master.sayNotWorkingYet(this, "FB Registration"));
         // Set the click listener for email/password registration
         registerButton.setOnClickListener(v -> {
             String email = emailInput.getText().toString().trim();

@@ -164,7 +164,7 @@
                     style="@style/UserCredentialInputText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Juan"
+                    android:hint=""
                     android:inputType="textPersonName" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -209,7 +209,7 @@
                     style="@style/UserCredentialInputText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Dela Cruz"
+                    android:hint=""
                     android:inputType="textPersonName" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -256,6 +256,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/registered_voter_container"
             android:layout_width="0dp"
+            android:visibility="gone"
             android:layout_height="50dp"
             android:layout_marginTop="@dimen/margin_slight_medium"
             app:layout_constraintEnd_toEndOf="parent"
@@ -317,7 +318,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/editPassword"
         android:layout_width="0dp"
-        android:layout_height="100dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_medium"
         app:layout_constraintEnd_toEndOf="@id/guidelineRight"
         app:layout_constraintHorizontal_bias="0.0"
@@ -372,6 +373,67 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+<!--    More features-->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/dailyPlyntContainer"
+        android:layout_width="0dp"
+        android:visibility="invisible"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_medium"
+        app:layout_constraintEnd_toEndOf="@id/guidelineRight"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@id/guidelineLeft"
+        app:layout_constraintTop_toBottomOf="@+id/editPassword"
+        app:layout_constraintWidth_percent="0.9">
+
+        <TextView
+            android:id="@+id/dailyPlyntTitleLabel"
+            style="@style/profileLabelTextStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Advanced Features"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/dailyPlyntContainerInner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dailyPlyntTitleLabel">
+
+            <TextView
+                android:id="@+id/dailyPlyntLabel"
+                style="@style/labelTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Daily Plynt"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/dailyPlyntGuidelineRight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.91" />
+
+            <ImageView
+                android:id="@+id/dailyPlyntIcon"
+                style="@style/icon_style"
+                android:layout_marginRight="@dimen/dimension_none"
+                android:src="@drawable/icon_good_morning"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/dailyPlyntGuidelineRight"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
 
     <!-- Register Button -->
 

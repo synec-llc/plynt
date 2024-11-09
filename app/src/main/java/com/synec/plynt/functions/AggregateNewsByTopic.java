@@ -29,7 +29,7 @@ public class AggregateNewsByTopic {
 
     public void processAndSaveNewsDataForTopics(List<String> extractedTopics, DataCallback callback) {
         FirebaseFirestore db = _Master.db;
-        JSONObject summaryJson = new JSONObject();
+        JSONObject summaryJson2 = new JSONObject();
         AtomicInteger topicsProcessed = new AtomicInteger(0);
 
         for (String topic : extractedTopics) {
@@ -38,11 +38,10 @@ public class AggregateNewsByTopic {
             List<JSONObject> newsItems = new ArrayList<>();
 
             // Query by keywords
-            Query keywordQuery = db.collection("NewsData")
-                    .whereArrayContains("keywords", topic);
+            Query keywordQuery = db.collection("NewsData");
             keywordQuery.get().addOnCompleteListener(task -> {
                 Log.d(TAG, "Keyword query completed for topic: " + topic);
-                handleQueryResults(task, topic, newsItems, matchedDocumentIds, summaryJson, extractedTopics.size(), topicsProcessed, callback);
+                handleQueryResults(task, topic, newsItems, matchedDocumentIds, summaryJson2, extractedTopics.size(), topicsProcessed, callback);
             });
         }
     }
@@ -53,18 +52,32 @@ public class AggregateNewsByTopic {
             for (QueryDocumentSnapshot document : task.getResult()) {
                 String documentId = document.getId();
                 if (!matchedDocumentIds.contains(documentId)) {
-                    matchedDocumentIds.add(documentId);
                     try {
-                        JSONObject newsJson = new JSONObject();
-                        newsJson.put("title", document.getString("title"));
-                        newsJson.put("publisher", document.getString("publisher"));
-                        newsJson.put("publishing_date", document.getString("publishing_date"));
-                        newsJson.put("author", document.getString("author"));
-                        newsJson.put("category", document.get("category"));
-                        newsJson.put("description", document.getString("description"));
-                        newsJson.put("keywords", document.get("keywords"));
-                        newsJson.put("url", document.getString("url"));
-                        newsItems.add(newsJson);
+                        String title = document.getString("title").toLowerCase();
+                        String description = document.getString("description");
+                        String content = document.contains("content") ? document.getString("content") : ""; // Assuming 'content' is another field you might want to check.
+
+                        // Check if the topic is mentioned in the title, description, or content
+                        if ((title != null && title.contains(topic.toLowerCase())))
+//                                (description != null && description.contains(topic)) )
+//                                ||
+
+//                                (content != null && content.contains(topic)))
+                        {
+
+                            matchedDocumentIds.add(documentId);
+                            JSONObject newsJson = new JSONObject();
+                            newsJson.put("title", title);
+                            newsJson.put("publisher", document.getString("publisher"));
+                            newsJson.put("publishing_date", document.getString("publishing_date"));
+                            newsJson.put("author", document.getString("author"));
+                            newsJson.put("category", document.get("category"));
+                            newsJson.put("description", description);
+                            newsJson.put("content", content); // Assuming you want to include it
+                            newsJson.put("keywords", document.get("keywords"));
+                            newsJson.put("url", document.getString("url"));
+                            newsItems.add(newsJson);
+                        }
                     } catch (Exception e) {
                         Log.e(TAG, "Error converting document to JSON for document ID: " + documentId, e);
                     }
@@ -92,4 +105,5 @@ public class AggregateNewsByTopic {
             callback.onError(task.getException());
         }
     }
+
 }

@@ -69,14 +69,12 @@ public class _Master {
     }
 
 
-
-
     public static void addDataToCollection(String collectionName, Map<String, Object> data, final OnSuccessListener<DocumentReference> callback, final OnFailureListener failureCallback) {
         // Add the data to Firestore with an auto-generated document ID
         db.collection(collectionName)
                 .add(data)
                 .addOnSuccessListener(documentReference -> {
-                    Log.d("Firestore", "Document added with ID: " + documentReference.getId() +" "+ collectionName);
+                    Log.d("Firestore", "Document added with ID: " + documentReference.getId() + " " + collectionName);
                     if (callback != null) {
                         callback.onSuccess(documentReference);  // Notify success
                     }
@@ -88,6 +86,7 @@ public class _Master {
                     }
                 });
     }
+
     public static void deleteDocumentById(String collectionName, String documentId, Context context, ImageView imageIcon,
                                           int imageIconUpdateResourceID) {
         db.collection(collectionName).document(documentId)
@@ -137,9 +136,6 @@ public class _Master {
     }
 
 
-
-
-
     public interface OnDocumentExistsCallback {
         void onResult(String documentId);
     }
@@ -183,10 +179,6 @@ public class _Master {
                     callback.onResult(null);
                 });
     }
-
-
-
-
 
 
     public static String getCurrentFormattedDateTime() {
@@ -651,6 +643,7 @@ public class _Master {
         // Apply changes to SharedPreferences
         editor.apply();
     }
+
     public static boolean isSessionExistingAlready(Context context) {
         // Access SharedPreferences
         SharedPreferences preferences = context.getSharedPreferences(PREF_NAME, PREF_MODE);
@@ -756,6 +749,8 @@ public class _Master {
     }
 
 
-
+    public static void sayNotWorkingYet(Context context, String feature){
+        Toast.makeText(context, "Sorry, "+feature+" is not working yet.", Toast.LENGTH_SHORT).show();
     }
+}
 

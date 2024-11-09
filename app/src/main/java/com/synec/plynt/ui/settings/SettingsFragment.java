@@ -16,7 +16,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
+import com.google.android.material.textfield.TextInputEditText;
 import com.synec.plynt.R;
+import com.synec.plynt._Master;
 import com.synec.plynt.bLogInActivity;
 
 public class SettingsFragment extends Fragment {
@@ -24,6 +27,10 @@ public class SettingsFragment extends Fragment {
     String TAG = "SettingsFragment";
     public static final String PREF_NAME = "currentSession"; // SharedPreferences name
     public static final int PREF_MODE = Context.MODE_PRIVATE; // Mode for SharedPreferences
+    private ImageView profileImageEdit, uploadIcon, editPasswordIcon, logOUtButton;
+    private TextInputEditText firstNameInput, lastNameInput, birthdayInput;
+    SharedPreferences preferences;
+
 
     public static SettingsFragment newInstance() {
         return new SettingsFragment();
@@ -32,16 +39,58 @@ public class SettingsFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_settings, container, false);
+        View root = inflater.inflate(R.layout.fragment_settings, container, false);
 
-        // Find the ImageView for log out
-        ImageView logOutIcon = view.findViewById(R.id.icon_log_out);
+        preferences = requireActivity().getSharedPreferences(_Master.PREF_NAME, Context.MODE_PRIVATE);
+        // Initialize ImageViews
+        uploadIcon = root.findViewById(R.id.upload_icon);
+        editPasswordIcon = root.findViewById(R.id.edit_password_icon);
+        profileImageEdit = root.findViewById(R.id.profileImageEdit);
+        logOUtButton = root.findViewById(R.id.icon_log_out);
 
-        // Set an OnClickListener to show the confirmation dialog
-        logOutIcon.setOnClickListener(v -> showLogOutConfirmation());
+        // Initialize TextInputEditTexts
+        firstNameInput = root.findViewById(R.id.firstNameInput);
+        lastNameInput = root.findViewById(R.id.lastNameInput);
+        birthdayInput = root.findViewById(R.id.birthdayInput);
 
-        return view;
+        // You can now use these views, for example:
+        profileImageEdit.setOnClickListener(v -> {
+            // Handle profile image edit click
+        });
+
+        editPasswordIcon.setOnClickListener(v -> {
+            Toast.makeText(getContext(), "Sorry, not working yet.", Toast.LENGTH_SHORT).show();
+        });
+        uploadIcon.setOnClickListener(v -> {
+            Toast.makeText(getContext(), "Sorry, not working yet.", Toast.LENGTH_SHORT).show();
+        });
+        logOUtButton.setOnClickListener(v -> {
+            showLogOutConfirmation();
+             });
+
+        setThings();
+        return root;
     }
+
+    private void setThings(){
+        // Retrieve stored session data
+        String firstName = preferences.getString("session_first_name", "");
+        String lastName = preferences.getString("session_last_name", "");
+        String birthday = preferences.getString("session_birthday", "");
+        String imageUrl = preferences.getString("session_image_url", "");
+        firstNameInput.setHint(firstName);
+        lastNameInput.setHint(lastName);
+        birthdayInput.setHint(birthday);
+        // Load image into profileImageEdit using Glide (or Picasso if you prefer)
+        if (!imageUrl.isEmpty()) {
+            Glide.with(this)
+                    .load(imageUrl)
+                    .placeholder(R.drawable.profile_silhoutte)  // Fallback image
+                    .error(R.drawable.profile_silhoutte)        // Error image
+                    .into(profileImageEdit);
+        }
+    }
+
 
     private void showLogOutConfirmation() {
         // Show a confirmation dialog
@@ -73,11 +122,11 @@ public class SettingsFragment extends Fragment {
         editor.apply();
         Log.d(TAG, "clearSessionData Successful ");
 
-        Toast.makeText(requireContext(), "Logged out successfully", Toast.LENGTH_SHORT).show();
     }
 
     private void redirectToLogin() {
         // Redirect to login activity
+        Toast.makeText(requireContext(), "Logged out successfully", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(getActivity(), bLogInActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Clear the back stack
         startActivity(intent);
