@@ -67,7 +67,7 @@ public class bSignUpConfirmationActivity extends AppCompatActivity {
             password = getIntent().getStringExtra("password");
             Log.d(TAG, "updateConfirmationInstructionMessage: passsword1 "+ password);
             if (email != null) {
-                String confirmationText = "A confirmation email with a link was sent to your email address \"" + email + "\". Click the link from the email then click Validate Confirmation Button below.";
+                String confirmationText = "A confirmation email with a link was sent to your email address \"" + email + "\". Click the link from the email then click Validate Confirmation Button below (Don't mess this process up I did not implement an 'Oh-you-made-a-mistake?-whatever-here's-a-backend-to-let-you-retry-again' thing here 🤪). Thanks";
                 securityCodeDescriptionText.setText(confirmationText);
             } else {
                 securityCodeDescriptionText.setText("A confirmation email was sent. Click the link in the email and then click Validate Confirmation Button below.");

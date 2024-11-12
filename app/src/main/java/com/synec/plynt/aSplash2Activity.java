@@ -77,9 +77,10 @@ public class aSplash2Activity extends AppCompatActivity {
     }
 
     private void getPitchDeck(){
-        Toast.makeText(aSplash2Activity.this, "Downloading Pitch Decks", Toast.LENGTH_SHORT).show();
+        Toast.makeText(aSplash2Activity.this, "Downloading Pitch Deck", Toast.LENGTH_SHORT).show();
         // Link to the Google Drive file
-        String url = "https://drive.google.com/uc?export=download&id=1GP_62zytd5eu20saxKytm-21nM5GfM84";
+//        String url = "https://drive.google.com/uc?export=download&id=1GP_62zytd5eu20saxKytm-21nM5GfM84";
+        String url = "https://drive.google.com/uc?export=download&id=1KEDixeTYgsNg6AYAu_Kgi4SiChk-w96U";
 
         // Create an Intent with ACTION_VIEW to open the link
         Intent intent = new Intent(Intent.ACTION_VIEW);
